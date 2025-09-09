@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { View } from "@/components/Themed";
 import { useRouter } from "expo-router";
+import * as LocalAuthentication from 'expo-local-authentication';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -19,6 +21,47 @@ export default function SignInScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false); // This should be loaded from a shared storage
+
+  useEffect(() => {
+    // In a real app, you would load this from AsyncStorage or a global state management solution
+    // For this example, we'll just keep it in the component's state.
+    // We will assume that the user has enabled it in the settings page.
+    checkBiometricAvailability();
+  }, []);
+
+  const checkBiometricAvailability = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    // For the purpose of this demo, we'll just assume biometric is enabled if available.
+    // In a real app, this would be tied to the switch in the settings page.
+    if (hasHardware && isEnrolled) {
+        setIsBiometricEnabled(true);
+    }
+  }
+
+  const handleBiometricSignIn = async () => {
+    if (!isBiometricEnabled) {
+        showAlert("Biometric Not Enabled", "Please enable biometric authentication in the settings.");
+        return;
+    }
+
+    try {
+      const { success } = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Sign in with your fingerprint",
+      });
+
+      if (success) {
+        showAlert("Biometric Login Successful", "Welcome back!");
+        router.replace("/dashboard" as any);
+      } else {
+        showAlert("Biometric Login Failed", "Please try again.");
+      }
+    } catch (error) {
+      showAlert("Error", "An error occurred during biometric authentication.");
+    }
+  };
+
 
   const handleSignIn = () => {
     if (email === "" || password === "") {
@@ -115,6 +158,13 @@ export default function SignInScreen() {
       <TouchableOpacity style={styles.button} onPress={handleSignIn}>
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
+
+      {/* Biometric Button */}
+      {isBiometricEnabled && (
+        <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricSignIn}>
+          <Ionicons name="finger-print" size={32} color="#43a047" />
+        </TouchableOpacity>
+      )}
 
       {/* Google Icon */}
       <TouchableOpacity
@@ -236,6 +286,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  biometricButton: {
+    alignSelf: 'center',
+    marginBottom: 16,
   },
   googleIconButton: {
     width: 60,

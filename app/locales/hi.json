@@ -12,5 +12,6 @@
   "languageSelection": "भाषा चुनें",
   "chooseLanguage": "अपनी पसंदीदा भाषा चुनें",
   "cancel": "रद्द करना",
-  "logoutMessage": "आपने लॉग आउट कर दिया है।"
+  "logoutMessage": "आपने लॉग आउट कर दिया है।",
+  "adminPage": "एडमिन पेज"
 }

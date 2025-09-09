@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Switch, TouchableOpacity, Alert, Image } from 'react-native';
+import { StyleSheet, Switch, TouchableOpacity, Alert, Image, Modal, View as RNView } from 'react-native';
 import { View, Text } from '../../../components/Themed';
 import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
@@ -13,6 +13,7 @@ export default function SettingsScreen() {
   const { t, setLanguage, locale } = useLanguage();
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isAccountMenuVisible, setAccountMenuVisible] = useState(false);
   const router = useRouter();
 
   const showLanguagePicker = () => {
@@ -96,6 +97,10 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleAccountSettings = () => {
+    setAccountMenuVisible(true);
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{t('settings')}</Text>
@@ -107,10 +112,34 @@ export default function SettingsScreen() {
       </TouchableOpacity>
 
       {/* Account Section */}
-      <TouchableOpacity style={styles.row} onPress={() => Alert.alert(t('account'), t('account') + ' settings coming soon!')}>
+      <TouchableOpacity style={styles.row} onPress={handleAccountSettings}>
         <MaterialCommunityIcons name="account-circle-outline" size={24} color="#27ae60" />
         <Text style={styles.label}>{t('account')}</Text>
       </TouchableOpacity>
+
+      {/* Account Settings Modal */}
+      <Modal
+        transparent={true}
+        visible={isAccountMenuVisible}
+        animationType="fade"
+        onRequestClose={() => setAccountMenuVisible(false)} >
+        <RNView style={styles.modalContainer}>
+            <RNView style={styles.modalBox}>
+                <TouchableOpacity style={styles.modalButton} onPress={() => {setAccountMenuVisible(false); Alert.alert("Edit Username", "Coming soon!")}}>
+                    <Text style={styles.modalButtonText}>Edit Username</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={() => {setAccountMenuVisible(false); Alert.alert("Change Password", "Coming soon!")}}>
+                    <Text style={styles.modalButtonText}>Change Password</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={() => {setAccountMenuVisible(false); Alert.alert("More", "Coming soon!")}}>
+                    <Text style={styles.modalButtonText}>More</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.modalButton, {backgroundColor: '#c0392b'}]} onPress={() => setAccountMenuVisible(false)}>
+                    <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+            </RNView>
+        </RNView>
+      </Modal>
 
       {/* Language Selection */}
       <TouchableOpacity style={styles.row} onPress={showLanguagePicker}>
@@ -203,5 +232,33 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 18,
     color: '#7f8c8d',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 16,
+    alignItems: "center",
+    elevation: 10,
+  },
+  modalButton: {
+    backgroundColor: "#43a047",
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center'
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
