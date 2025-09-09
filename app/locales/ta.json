@@ -14,5 +14,18 @@
   "cancel": "ரத்துசெய்",
   "logoutMessage": "நீங்கள் வெளியேறிவிட்டீர்கள்.",
   "adminPage": "நிர்வாக பக்கம்",
-  "enableLocation": "இருப்பிடத்தை இயக்கு"
+  "enableLocation": "இருப்பிடத்தை இயக்கு",
+  "analysis": "பகுப்பாய்வு",
+  "takePicture": "படம் எடு",
+  "uploadImage": "படத்தை பதிவேற்று",
+  "biodegradable": "மக்கும்",
+  "nonBiodegradable": "மக்காத",
+  "recyclable": "மறுசுழற்சி",
+  "analysisResult": "பகுப்பாய்வு முடிவு",
+  "cameraPermissionRequired": "இந்த அம்சத்தைப் பயன்படுத்த கேமரா அனுமதி தேவை.",
+  "galleryPermissionRequired": "இந்த அம்சத்தைப் பயன்படுத்த கேலரி அனுமதி தேவை.",
+  "dashboard": "டாஷ்போர்டு",
+  "iot": "IoT",
+  "maps": "வரைபடங்கள்",
+  "rewards": "வெகுமதிகள்"
 }

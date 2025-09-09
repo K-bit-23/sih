@@ -14,5 +14,18 @@
   "cancel": "Cancel",
   "logoutMessage": "You have been logged out.",
   "adminPage": "Admin Page",
-  "enableLocation": "Enable Location"
+  "enableLocation": "Enable Location",
+  "analysis": "Analysis",
+  "takePicture": "Take Picture",
+  "uploadImage": "Upload Image",
+  "biodegradable": "Biodegradable",
+  "nonBiodegradable": "Non-Biodegradable",
+  "recyclable": "Recyclable",
+  "analysisResult": "Analysis Result",
+  "cameraPermissionRequired": "Camera permission is required to use this feature.",
+  "galleryPermissionRequired": "Gallery permission is required to use this feature.",
+  "dashboard": "Dashboard",
+  "iot": "IoT",
+  "maps": "Maps",
+  "rewards": "Rewards"
 }

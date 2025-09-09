@@ -2,9 +2,11 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function TabLayout() {
   const { colorScheme } = useTheme();
+  const { t } = useLanguage();
 
   const colors = {
     light: {
@@ -44,42 +46,42 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'Dashboard',
+          title: t('dashboard'),
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="tachometer" color={color} />,
         }}
       />
       <Tabs.Screen
         name="analysis"
         options={{
-          title: 'Analysis',
+          title: t('analysis'),
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="bar-chart" color={color} />,
         }}
       />
       <Tabs.Screen
         name="iot-connect"
         options={{
-          title: 'IoT',
+          title: t('iot'),
           tabBarIcon: ({ color }) => <Ionicons size={28} name="hardware-chip" color={color} />,
         }}
       />
         <Tabs.Screen
         name="maps"
         options={{
-          title: 'Maps',
+          title: t('maps'),
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="map" color={color} />,
         }}
       />
         <Tabs.Screen
         name="rewards"
         options={{
-          title: 'Rewards',
+          title: t('rewards'),
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="gift" color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t('settings'),
           tabBarIcon: ({ color }) => <Ionicons size={28} name="settings" color={color} />,
         }}
       />
