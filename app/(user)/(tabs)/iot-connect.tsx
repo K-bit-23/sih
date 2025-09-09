@@ -43,7 +43,7 @@ export default function IoTConnectScreen() {
     setTimeout(() => {
       setIsConnecting(false);
       setConnected(true);
-      Alert.alert(t('deviceConnected'), t('successfullyConnectedToDevice', { device: data }))
+      Alert.alert(t('deviceConnected'), t('successfullyConnectedToDevice').replace('{{device}}', data))
     }, 2000);
   };
 
