@@ -1,42 +1,47 @@
-import { FlatList, StyleSheet } from "react-native";
-import { Text, View } from "@/components/Themed";
+import React from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 
-type WasteLogItem = {
-  id: string;
-  type: string;
-  weight: string;
-  date: string;
-};
-
-type WasteLogListProps = {
-  data: WasteLogItem[];
-};
-
-export default function WasteLogList({ data }: WasteLogListProps) {
-  return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <View style={styles.listItem}>
-          <Text style={styles.type}>{item.type}</Text>
-          <Text>{item.weight}</Text>
-          <Text style={styles.date}>{item.date}</Text>
-        </View>
-      )}
-      ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-    />
+const WasteLogList = ({ data }) => {
+  const renderItem = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <Text style={styles.itemText}>{item.type}</Text>
+      <Text style={styles.itemText}>{item.weight}</Text>
+      <Text style={styles.itemText}>{item.date}</Text>
+    </View>
   );
-}
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Waste Log</Text>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  listItem: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
+  container: {
+    flex: 1,
+    padding: 16,
   },
-  type: { fontWeight: "bold" },
-  date: { color: "gray", fontSize: 12 },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  itemText: {
+    fontSize: 16,
+  },
 });
+
+export default WasteLogList;

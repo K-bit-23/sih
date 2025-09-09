@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
-import WasteLogList from "@/components/WasteLogList";
+import WasteLogList from "../../components/WasteLogList";
 import { useState } from "react";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
