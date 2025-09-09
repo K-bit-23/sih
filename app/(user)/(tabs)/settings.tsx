@@ -17,6 +17,12 @@ export default function SettingsScreen() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isAccountMenuVisible, setAccountMenuVisible] = useState(false);
   const router = useRouter();
+  const [tabVisibility, setTabVisibility] = useState({
+    dashboard: true,
+    waste: true,
+    connect: true,
+    analytics: true,
+  });
 
   const showLanguagePicker = () => {
     Alert.alert(
@@ -195,11 +201,21 @@ export default function SettingsScreen() {
       </View>
 
       {/* Tab Bar Customization */}
-      <TouchableOpacity style={styles.row} onPress={() => Alert.alert(t('customizeTabs'), t('customizeTabs') + ' coming soon!')}>
+      <View style={styles.row}>
         <Ionicons name="options" size={24} color="#27ae60" />
         <Text style={styles.label}>{t('customizeTabs')}</Text>
-      </TouchableOpacity>
-      
+      </View>
+
+      {Object.keys(tabVisibility).map((tab) => (
+        <View key={tab} style={styles.subRow}>
+          <Text style={styles.subLabel}>{t(tab)}</Text>
+          <Switch
+            value={tabVisibility[tab as keyof typeof tabVisibility]}
+            onValueChange={(value) => setTabVisibility({ ...tabVisibility, [tab]: value })}
+          />
+        </View>
+      ))}
+
       {/* Logout Button */}
       <TouchableOpacity style={styles.row} onPress={handleLogout}>
         <MaterialCommunityIcons name="logout" size={24} color="#c0392b" />
@@ -245,10 +261,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ecf0f1',
   },
+  subRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingLeft: 40, // Indent sub-rows
+    borderBottomWidth: 1,
+    borderBottomColor: '#ecf0f1',
+  },
   label: {
     fontSize: 18,
     marginLeft: 15,
     color: '#333',
+    flex: 1,
+  },
+  subLabel: {
+    fontSize: 16,
+    marginLeft: 15,
+    color: '#555',
     flex: 1,
   },
   value: {

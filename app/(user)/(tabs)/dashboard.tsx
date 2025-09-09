@@ -5,6 +5,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 import { View, Text } from "../../../components/Themed";
 import WasteLogList from "../../../components/WasteLogList";
@@ -58,7 +59,7 @@ export default function DashboardScreen() {
   ];
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <StatusBar hidden />
 
       <View style={styles.menuBar}>
@@ -97,7 +98,7 @@ export default function DashboardScreen() {
       </View>
 
       <WasteLogList data={wasteLog} />
-    </View>
+    </ScrollView>
   );
 }
 
