@@ -1,137 +1,86 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   View as RNView,
+  TextInput,
   Alert,
-  Image,
-  Animated,
-  Easing,
-  Platform,
 } from 'react-native';
 import { View } from '../../../components/Themed';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../../../constants/Colors';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Camera } from 'expo-camera';
-import * as ImagePicker from 'expo-image-picker';
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useLanguage } from '../../context/LanguageContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function IoTConnectScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
+  const [deviceId, setDeviceId] = useState('');
+  const [wifiSsid, setWifiSsid] = useState('');
+  const [wifiPassword, setWifiPassword] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [connected, setConnected] = useState(false);
-  const animation = useRef(new Animated.Value(0)).current;
   const { t } = useLanguage();
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-    setScanned(true);
+  const handleConnect = () => {
+    if (!deviceId || !wifiSsid || !wifiPassword) {
+      Alert.alert(t('error'), t('fillAllFields'));
+      return;
+    }
     setIsConnecting(true);
-    console.log(`Bar code with type ${type} and data ${data} has been scanned!`);
+    console.log(`Connecting device ${deviceId} to ${wifiSsid}`);
 
     // Simulate a connection process
     setTimeout(() => {
       setIsConnecting(false);
       setConnected(true);
-      Alert.alert(t('deviceConnected'), t('successfullyConnectedToDevice').replace('{{device}}', data))
+      Alert.alert(
+        t('deviceConnected'),
+        t('successfullyConnectedToDevice').replace('{{device}}', deviceId)
+      );
     }, 2000);
   };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      const fileUri = result.assets[0].uri;
-      if (Platform.OS === 'web' && result.assets[0].base64) {
-        // Barcode scanner for web needs a different approach
-        // This is a placeholder for web-based QR code scanning
-        Alert.alert(t('error'), t('couldNotScanQRCode'));
-      } else if (fileUri) {
-        try {
-            const scannedResults = await BarCodeScanner.scanFromURLAsync(fileUri);
-            if (scannedResults.length > 0) {
-                handleBarCodeScanned(scannedResults[0]);
-            } else {
-                Alert.alert(t('noQRCodeFound'));
-            }
-        } catch (error) {
-            console.error("Error scanning QR code from image: ", error);
-            Alert.alert(t('error'), t('couldNotScanQRCode'));
-        }
-      }
-    }
-  };
-
-  const startAnimation = () => {
-    animation.setValue(0);
-    Animated.loop(
-      Animated.timing(animation, {
-        toValue: 1,
-        duration: 2000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  };
-
-  useEffect(() => {
-    if (hasPermission === true) {
-        startAnimation();
-    }
-  }, [hasPermission]);
-
-  const scanAreaSize = 250;
-  const scanAreaY = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, scanAreaSize],
-  });
-
-  if (hasPermission === null) {
-    return <Text>{t('requestingCameraPermission')}</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>{t('noCameraAccess')}</Text>;
-  }
 
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[Colors.light.primary, Colors.light.accent]} // Use your theme colors
+        colors={[Colors.light.primary, Colors.light.accent]}
         style={styles.header}
       >
         <Text style={styles.headerText}>{t('connectToYourDevice')}</Text>
-        <Text style={styles.subHeaderText}>{t('scanQRCodeToGetStarted')}</Text>
+        <Text style={styles.subHeaderText}>{t('enterDeviceDetails')}</Text>
       </LinearGradient>
 
-      <View style={styles.scannerContainer}>
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}
-        />
-        <View style={styles.scanArea}>
-            <Animated.View style={[styles.scanLine, { transform: [{ translateY: scanAreaY }] }]} />
+      <View style={styles.formContainer}>
+        <View style={styles.inputContainer}>
+          <FontAwesome5 name="robot" size={20} color={Colors.light.primary} />
+          <TextInput
+            style={styles.input}
+            placeholder={t('deviceId')}
+            value={deviceId}
+            onChangeText={setDeviceId}
+          />
         </View>
-      </View>
-
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.galleryButton} onPress={pickImage}>
-          <FontAwesome5 name="images" size={24} color="white" />
-          <Text style={styles.galleryButtonText}>{t('scanFromGallery')}</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome5 name="wifi" size={20} color={Colors.light.primary} />
+          <TextInput
+            style={styles.input}
+            placeholder={t('wifiSsid')}
+            value={wifiSsid}
+            onChangeText={setWifiSsid}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <FontAwesome5 name="lock" size={20} color={Colors.light.primary} />
+          <TextInput
+            style={styles.input}
+            placeholder={t('wifiPassword')}
+            value={wifiPassword}
+            onChangeText={setWifiPassword}
+            secureTextEntry
+          />
+        </View>
+        <TouchableOpacity style={styles.connectButton} onPress={handleConnect}>
+          <Text style={styles.connectButtonText}>{t('connect')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -146,7 +95,15 @@ export default function IoTConnectScreen() {
         <View style={[styles.overlay, styles.successOverlay]}>
           <FontAwesome5 name="check-circle" size={60} color="white" />
           <Text style={styles.overlayText}>{t('deviceConnected')}</Text>
-          <TouchableOpacity style={styles.tryAgainButton} onPress={() => { setConnected(false); setScanned(false); }}>
+          <TouchableOpacity
+            style={styles.tryAgainButton}
+            onPress={() => {
+              setConnected(false);
+              setDeviceId('');
+              setWifiSsid('');
+              setWifiPassword('');
+            }}
+          >
             <Text style={styles.tryAgainButtonText}>{t('connectAnotherDevice')}</Text>
           </TouchableOpacity>
         </View>
@@ -158,7 +115,7 @@ export default function IoTConnectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: Colors.light.background,
   },
   header: {
     paddingTop: 50,
@@ -178,41 +135,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
   },
-  scannerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scanArea: {
-    width: 250,
-    height: 250,
-    borderWidth: 2,
-    borderColor: 'white',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  scanLine: {
-    width: '100%',
-    height: 2,
-    backgroundColor: '#6200ee',
-  },
-  footer: {
+  formContainer: {
     padding: 20,
-    alignItems: 'center',
   },
-  galleryButton: {
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  connectButton: {
     backgroundColor: Colors.light.primary,
     paddingVertical: 15,
-    paddingHorizontal: 30,
     borderRadius: 10,
+    alignItems: 'center',
   },
-  galleryButtonText: {
+  connectButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 10,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
