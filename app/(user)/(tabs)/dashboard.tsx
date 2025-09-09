@@ -27,6 +27,13 @@ interface CardProps {
   icon: React.ComponentProps<typeof FontAwesome>['name'];
 }
 
+interface CardData {
+  id: string;
+  title: string;
+  value: string;
+  icon: React.ComponentProps<typeof FontAwesome>['name'];
+}
+
 const InfoCard = ({ title, value, icon }: CardProps) => (
   <View style={styles.card}>
     <FontAwesome name={icon} size={24} color={Colors.light.primary} />
@@ -38,12 +45,11 @@ const InfoCard = ({ title, value, icon }: CardProps) => (
 export default function DashboardScreen() {
   const router = useRouter();
 
-  // Replace with your actual sensor data
   const [temperature] = useState("28°C");
   const [humidity] = useState("65%");
-  const videoUrl = ""; // set your stream/video URL here
+  const videoUrl = "";
 
-  const cards = [
+  const cards: CardData[] = [
     { id: "1", title: "Temperature", value: temperature, icon: "thermometer-three-quarters" },
     { id: "2", title: "Humidity", value: humidity, icon: "tint" },
     { id: "3", title: "Recyclable", value: "1.8 kg", icon: "recycle" },
@@ -55,7 +61,6 @@ export default function DashboardScreen() {
     <View style={styles.container}>
       <StatusBar hidden />
 
-      {/* Header */}
       <View style={styles.menuBar}>
         <Text style={styles.title}>🌱 Eco Dashboard</Text>
         <TouchableOpacity onPress={() => router.push('/(user)/(tabs)/settings')}>
@@ -63,7 +68,6 @@ export default function DashboardScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Video Section */}
       <View style={styles.videoBox}>
         {videoUrl ? (
           <Video
@@ -81,7 +85,6 @@ export default function DashboardScreen() {
         )}
       </View>
 
-      {/* Cards Grid */}
       <View style={styles.gridContainer}>
         {cards.map((item) => (
           <InfoCard
@@ -93,7 +96,6 @@ export default function DashboardScreen() {
         ))}
       </View>
 
-      {/* Waste Logs */}
       <WasteLogList data={wasteLog} />
     </View>
   );
@@ -102,7 +104,6 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.light.background },
 
-  // Header
   menuBar: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -113,7 +114,6 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 24, fontWeight: "bold", color: Colors.light.primary },
 
-  // Video
   videoBox: {
     width: "100%",
     height: 200,
@@ -137,7 +137,6 @@ const styles = StyleSheet.create({
   },
   errorText: { marginTop: 8, color: Colors.light.danger, fontWeight: "600" },
 
-  // Info Cards
   gridContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
