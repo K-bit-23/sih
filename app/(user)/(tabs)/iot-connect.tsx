@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,7 +7,7 @@ import {
   View as RNView,
   TouchableOpacity,
 } from "react-native";
-import { View } from "@/components/Themed";
+import { View } from "../../../components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -163,4 +163,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-//add tab bar icon like dashboard,settings etc

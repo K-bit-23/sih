@@ -27,11 +27,15 @@ export default function SignInScreen() {
     }
 
     if (role === "admin") {
-      showAlert("👨‍💻 Admin Login", "Welcome back, Admin!");
-      router.replace("/(tabs)/dashboard");
+      if (email === "admin" && password === "admin") {
+        showAlert("👨‍💻 Admin Login", "Welcome back, Admin!");
+        router.replace("/admin" as any);
+      } else {
+        showAlert("Login Failed", "Invalid admin credentials.");
+      }
     } else {
       showAlert("🙋‍♂️ User Login", "Welcome back, User!");
-      router.replace("/(tabs)/dashboard");
+      router.replace("/dashboard" as any);
     }
   };
 

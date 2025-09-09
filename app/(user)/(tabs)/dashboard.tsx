@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   StatusBar,
@@ -5,9 +6,8 @@ import {
   Modal,
   TouchableOpacity,
 } from "react-native";
-import { View, Text } from "@/components/Themed";
-import WasteLogList from "../../components/WasteLogList";
-import { useState } from "react";
+import { View, Text } from "../../../components/Themed";
+import WasteLogList from "../../../components/WasteLogList";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Video, ResizeMode } from "expo-av";
