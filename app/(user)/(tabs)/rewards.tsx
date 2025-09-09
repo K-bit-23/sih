@@ -5,18 +5,33 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
+  View as RNView,
+  FlatList,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import * as ImagePicker from "expo-image-picker";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import Colors from "../constants/Colors";
 
+const leaderboardData = [
+  { id: "1", rank: 1, user: "GreenWarrior", points: 2500 },
+  { id: "2", rank: 2, user: "EcoSavvy", points: 2350 },
+  { id: "3", rank: 3, user: "RecycleKing", points: 2100 },
+  { id: "4", rank: 4, user: "WasteWatcher", points: 1980 },
+  { id: "5", rank: 5, user: "PlanetProtector", points: 1820 },
+  { id: "6", rank: 6, user: "SortMaster", points: 1700 },
+  { id: "7", rank: 7, user: "EcoChamp", points: 1550 },
+  { id: "8", rank: 8, user: "TerraGuard", points: 1400 },
+  { id: "9", rank: 9, user: "EnviroHero", points: 1250 },
+  { id: "10", rank: 10, user: "NatureLover", points: 1100 },
+];
 
 export default function RewardsScreen() {
   const [upiId, setUpiId] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [image, setImage] = useState<string | null>(null);
 
-  // Pick image from gallery
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -27,7 +42,6 @@ export default function RewardsScreen() {
     }
   };
 
-  // Take photo from camera
   const takePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -40,65 +54,84 @@ export default function RewardsScreen() {
 
   const handleSubmit = () => {
     if (!upiId && !mobileNumber) {
-      alert("Please enter UPI ID or Mobile Number");
+      Alert.alert("Missing Information", "Please enter a UPI ID or Mobile Number.");
       return;
     }
     if (!image) {
-      alert("Please upload/take a screenshot");
+      Alert.alert("Missing Screenshot", "Please upload or take a screenshot of the QR code.");
       return;
     }
-    alert(`Form submitted!\nUPI: ${upiId}\nMobile: ${mobileNumber}\nImage attached ✅`);
+    Alert.alert(
+      "Submission Successful!",
+      `Your request has been submitted with the following details:\nUPI/Mobile: ${upiId || mobileNumber}\nImage attached ✅`
+    );
   };
+
+  const renderLeaderboardItem = ({ item }: { item: typeof leaderboardData[0] }) => (
+    <RNView style={styles.leaderboardRow}>
+      <Text style={[styles.leaderboardText, styles.rank]}>{item.rank}</Text>
+      <Text style={[styles.leaderboardText, styles.user]}>{item.user}</Text>
+      <Text style={[styles.leaderboardText, styles.points]}>{item.points}</Text>
+    </RNView>
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🎁 Rewards</Text>
-      <Text style={styles.pointsText}>You have earned 120 points!</Text>
+      <Text style={styles.title}>🏆 Leaderboard</Text>
+      <View style={styles.leaderboardContainer}>
+        <View style={styles.leaderboardHeader}>
+          <Text style={[styles.headerText, styles.rank]}>Rank</Text>
+          <Text style={[styles.headerText, styles.user]}>User</Text>
+          <Text style={[styles.headerText, styles.points]}>Points</Text>
+        </View>
+        <FlatList
+          data={leaderData.slice(0, 10)}
+          renderItem={renderLeaderboardItem}
+          keyExtractor={(item) => item.id}
+        />
+      </View>
+
+      <Text style={styles.title}>🎁 Claim Your Rewards</Text>
       <Text style={styles.subText}>
-        Redeem your points by submitting your details below.
+        Redeem your points by submitting your payment details below.
       </Text>
 
-      {/* Input Fields */}
       <TextInput
         style={styles.input}
-        placeholder="Enter UPI ID"
+        placeholder="Enter UPI ID or Mobile Number"
         placeholderTextColor="#888"
-        value={upiId}
-        onChangeText={setUpiId}
-      />
-      <Text style={styles.orText}>OR</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Mobile Number"
-        placeholderTextColor="#888"
-        keyboardType="phone-pad"
-        value={mobileNumber}
-        onChangeText={setMobileNumber}
+        value={upiId || mobileNumber}
+        onChangeText={(text) => {
+          if (isNaN(Number(text))) {
+            setUpiId(text);
+            setMobileNumber("");
+          } else {
+            setMobileNumber(text);
+            setUpiId("");
+          }
+        }}
       />
 
-      {/* Image Upload Buttons */}
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
           <FontAwesome name="image" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Gallery</Text>
+          <Text style={styles.buttonText}>Upload Screenshot</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
           <FontAwesome name="camera" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Camera</Text>
+          <Text style={styles.buttonText}>Take Photo</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Preview Selected Image */}
       {image && (
         <View style={styles.previewBox}>
           <Image source={{ uri: image }} style={styles.previewImage} />
-          <Text style={styles.previewText}>Screenshot attached</Text>
+          <Text style={styles.previewText}>QR code attached</Text>
         </View>
       )}
 
-      {/* Submit Button */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Submit</Text>
+        <Text style={styles.submitText}>Claim Reward</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -107,47 +140,83 @@ export default function RewardsScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#f6fff9",
+    backgroundColor: Colors.light.background,
   },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 10, color: "#27ae60" },
-  pointsText: { fontSize: 18, fontWeight: "600", marginBottom: 5 },
-  subText: { fontSize: 14, color: "#555", marginBottom: 20, textAlign: "center" },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginVertical: 20,
+    color: Colors.light.primary,
+  },
+  subText: {
+    fontSize: 14,
+    color: Colors.light.text,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  leaderboardContainer: {
+    width: '100%',
+    marginBottom: 20,
+    backgroundColor: Colors.light.card,
+    borderRadius: 12,
+    padding: 15,
+    elevation: 3,
+  },
+  leaderboardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.light.primary,
+    paddingBottom: 10,
+    marginBottom: 10,
+  },
+  headerText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.light.primary,
+  },
+  leaderboardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+  },
+  leaderboardText: {
+    fontSize: 14,
+    color: Colors.light.text,
+  },
+  rank: { flex: 1, textAlign: 'center' },
+  user: { flex: 3 },
+  points: { flex: 2, textAlign: 'right' },
   input: {
-    width: "90%",
+    width: "100%",
     borderWidth: 1,
-    borderColor: "#27ae60",
+    borderColor: Colors.light.primary,
     borderRadius: 10,
     padding: 12,
-    marginBottom: 12,
+    marginBottom: 20,
     fontSize: 16,
     backgroundColor: "#fff",
   },
-  orText: {
-    marginVertical: 8,
-    fontWeight: "bold",
-    color: "#555",
-  },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "center",
-    gap: 15,
+    justifyContent: "space-around",
+    width: '100%',
     marginBottom: 20,
   },
   actionButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#27ae60",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    backgroundColor: Colors.light.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 8,
     elevation: 2,
   },
   buttonText: {
     color: "#fff",
-    marginLeft: 6,
+    marginLeft: 10,
     fontWeight: "600",
   },
   previewBox: {
@@ -158,21 +227,20 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 12,
-    marginBottom: 8,
+    marginBottom: 10,
     borderWidth: 2,
-    borderColor: "#27ae60",
+    borderColor: Colors.light.primary,
   },
   previewText: {
-    color: "#27ae60",
+    color: Colors.light.primary,
     fontWeight: "bold",
   },
   submitButton: {
-    backgroundColor: "#27ae60",
+    backgroundColor: Colors.light.accent,
     paddingVertical: 14,
-    paddingHorizontal: 40,
+    paddingHorizontal: 50,
     borderRadius: 30,
     elevation: 3,
-    marginTop: 10,
   },
   submitText: {
     color: "#fff",
@@ -180,4 +248,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-//BOTTOM NAVBAR  FOR SETTINGS PAGE,DASHBOARD PAGE,REWARDS PAGE,MAPS PAGE,IoT CONNECT PAGE
