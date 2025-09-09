@@ -12,7 +12,7 @@ import {
 import { View, Text } from "@/components/Themed";
 import * as ImagePicker from "expo-image-picker";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import Colors from "../constants/Colors";
+import Colors from "../../../constants/Colors";
 
 const leaderboardData = [
   { id: "1", rank: 1, user: "GreenWarrior", points: 2500 },
@@ -85,7 +85,7 @@ export default function RewardsScreen() {
           <Text style={[styles.headerText, styles.points]}>Points</Text>
         </View>
         <FlatList
-          data={leaderData.slice(0, 10)}
+          data={leaderboardData.slice(0, 10)}
           renderItem={renderLeaderboardItem}
           keyExtractor={(item) => item.id}
         />
