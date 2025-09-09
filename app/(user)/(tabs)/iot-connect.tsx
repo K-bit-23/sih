@@ -48,29 +48,29 @@ export default function IoTConnectScreen() {
   };
 
   const processQrData = (data: string) => {
-     try {
+    try {
       const qrData = JSON.parse(data);
       if (qrData.brokerIP && qrData.deviceName && qrData.subscribeTopic && qrData.publishTopic) {
         setTempQrData(qrData);
         setModalContent({
-          title: "QR Code Scanned",
+          title: "IoT Device Details",
           message: `Broker IP: ${qrData.brokerIP}\nDevice Name: ${qrData.deviceName}\nSubscribe Topic: ${qrData.subscribeTopic}\nPublish Topic: ${qrData.publishTopic}`
         });
-        setModalVisible(true);
       } else {
+        setTempQrData(null);
         setModalContent({
-          title: "❌ Invalid QR Code",
-          message: "The QR code does not contain the required IoT device details."
+          title: "QR Code Content",
+          message: JSON.stringify(qrData, null, 2)
         });
-        setModalVisible(true);
       }
     } catch (error) {
+      setTempQrData(null);
       setModalContent({
-          title: "❌ Invalid QR Code",
-          message: "Failed to parse QR code data. Please ensure it's a valid JSON format."
+        title: "QR Code Content",
+        message: data
       });
-      setModalVisible(true);
     }
+    setModalVisible(true);
   }
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
