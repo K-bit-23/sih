@@ -86,7 +86,7 @@ export default function SettingsScreen() {
       {/* Device Section */}
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Text style={[styles.cardTitle, { color: colors.primary }]}>Device</Text>
-        <Link href="/(user)/iot-connect" asChild>
+        <Link href="/iot-connect" asChild>
           <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]}>
             <FontAwesome5 name="robot" size={20} color="#fff" />
             <Text style={styles.buttonText}>Connect Device</Text>
