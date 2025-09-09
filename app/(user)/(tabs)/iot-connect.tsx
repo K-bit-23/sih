@@ -8,12 +8,14 @@ import {
   TouchableOpacity,
   Modal,
   Button,
+  Image,
 } from "react-native";
 import { View } from "../../../components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function IoTConnectScreen() {
   const [brokerIP, setBrokerIP] = useState("");
@@ -25,6 +27,7 @@ export default function IoTConnectScreen() {
   const [scanned, setScanned] = useState(false);
   const [isScannerVisible, setScannerVisible] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
+  const [image, setImage] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -55,6 +58,18 @@ export default function IoTConnectScreen() {
       }
     } catch (error) {
       Alert.alert("❌ Invalid QR Code", "Failed to parse QR code data. Please ensure it's a valid JSON format.");
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setImage(result.assets[0].uri);
+      Alert.alert("Coming Soon", "QR Code decoding from an uploaded image is coming soon!");
     }
   };
 
@@ -89,12 +104,25 @@ export default function IoTConnectScreen() {
 
       <RNView style={styles.card}>
         <Text style={styles.title}>Device Details</Text>
-        <Text style={styles.subtitle}>Enter your IoT device details below or scan a QR code.</Text>
+        <Text style={styles.subtitle}>Enter your IoT device details below or use a QR code.</Text>
 
-        <TouchableOpacity activeOpacity={0.8} style={styles.qrButton} onPress={() => { setScanned(false); setScannerVisible(true); }}>
-          <FontAwesome name="qrcode" size={24} color="#fff" />
-          <Text style={styles.buttonText}>Scan QR Code</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity activeOpacity={0.8} style={styles.qrButton} onPress={() => { setScanned(false); setScannerVisible(true); }}>
+            <FontAwesome name="qrcode" size={24} color="#fff" />
+            <Text style={styles.buttonText}>Scan QR</Text>
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.8} style={styles.uploadButton} onPress={pickImage}>
+            <FontAwesome name="upload" size={24} color="#fff" />
+            <Text style={styles.buttonText}>Upload QR</Text>
+          </TouchableOpacity>
+        </View>
+
+        {image && (
+            <View style={styles.previewBox}>
+                <Image source={{ uri: image }} style={styles.previewImage} />
+                <Text style={styles.previewText}>Image selected</Text>
+            </View>
+        )}
 
         <TextInput
           style={styles.input}
@@ -230,6 +258,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 15,
+  },
   qrButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -237,7 +271,16 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.accent,
     paddingVertical: 14,
     borderRadius: 10,
-    marginBottom: 20,
+    flex: 1,
+  },
+  uploadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#3498db',
+    paddingVertical: 14,
+    borderRadius: 10,
+    flex: 1,
   },
   buttonText: {
     color: "#fff",
@@ -261,6 +304,22 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 18,
     color: '#000',
+    fontWeight: 'bold',
+  },
+  previewBox: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  previewImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: Colors.light.primary,
+  },
+  previewText: {
+    color: Colors.light.primary,
     fontWeight: 'bold',
   },
 });
