@@ -70,7 +70,10 @@ const TabLayout = () => {
        <Tabs.Screen
         name="iot-connect"
         options={{
-          href: null,
+          title: t("iot"),
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="cloud-queue" size={24} color={color} />
+          ),
         }}
       />
     </Tabs>
