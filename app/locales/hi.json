@@ -10,8 +10,9 @@
   "customizeTabs": "निचले टैब को अनुकूलित करें",
   "logout": "लॉग आउट",
   "languageSelection": "भाषा चुनें",
-  "chooseLanguage": "अपनी पसंदीदा भाषा चुनें",
+  "chooseLanguage": " अपनी पसंदीदा भाषा चुनें",
   "cancel": "रद्द करना",
   "logoutMessage": "आपने लॉग आउट कर दिया है।",
-  "adminPage": "एडमिन पेज"
+  "adminPage": "एडमिन पेज",
+  "enableLocation": "स्थान सक्षम करें"
 }

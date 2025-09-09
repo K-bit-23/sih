@@ -13,5 +13,6 @@
   "chooseLanguage": "Choose your preferred language",
   "cancel": "Cancel",
   "logoutMessage": "You have been logged out.",
-  "adminPage": "Admin Page"
+  "adminPage": "Admin Page",
+  "enableLocation": "Enable Location"
 }

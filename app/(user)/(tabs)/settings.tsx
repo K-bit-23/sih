@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { StyleSheet, Switch, TouchableOpacity, Alert, Image, Modal, View as RNView } from 'react-native';
 import { View, Text } from '../../../components/Themed';
@@ -12,6 +13,7 @@ export default function SettingsScreen() {
   const { colorScheme, setColorScheme } = useTheme();
   const { t, setLanguage, locale } = useLanguage();
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const [isLocationEnabled, setIsLocationEnabled] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isAccountMenuVisible, setAccountMenuVisible] = useState(false);
   const router = useRouter();
@@ -29,7 +31,7 @@ export default function SettingsScreen() {
       { cancelable: true }
     );
   };
-  
+
   const getLanguageName = (locale: string) => {
     if (locale.startsWith('en')) return t('english');
     if (locale.startsWith('ta')) return t('tamil');
@@ -95,6 +97,14 @@ export default function SettingsScreen() {
         Alert.alert(t('error'), t('authenticationFailed'));
       }
     }
+  };
+
+  const handleLocationToggle = () => {
+    setIsLocationEnabled(previousState => !previousState);
+    Alert.alert(
+      isLocationEnabled ? t('disableLocation') : t('enableLocation'),
+      isLocationEnabled ? t('locationDisabledMessage') : t('locationEnabledMessage')
+    );
   };
 
   const handleAccountSettings = () => {
@@ -169,6 +179,18 @@ export default function SettingsScreen() {
           thumbColor={isBiometricEnabled ? '#f5dd4b' : '#f4f3f4'}
           onValueChange={handleBiometricToggle}
           value={isBiometricEnabled}
+        />
+      </View>
+
+      {/* Enable Location */}
+      <View style={styles.row}>
+        <MaterialCommunityIcons name="map-marker" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('enableLocation')}</Text>
+        <Switch
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={isLocationEnabled ? '#f5dd4b' : '#f4f3f4'}
+          onValueChange={handleLocationToggle}
+          value={isLocationEnabled}
         />
       </View>
 
