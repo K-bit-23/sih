@@ -3,8 +3,8 @@ import {
   StyleSheet,
   StatusBar,
   Dimensions,
-  Modal,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { View, Text } from "../../../components/Themed";
 import WasteLogList from "../../../components/WasteLogList";
@@ -34,7 +34,6 @@ const InfoCard = ({ title, value, color }: CardProps) => (
 );
 
 export default function DashboardScreen() {
-  const [menuVisible, setMenuVisible] = useState(false);
   const router = useRouter();
 
   // Replace with your actual sensor data
@@ -57,85 +56,10 @@ export default function DashboardScreen() {
       {/* Header */}
       <View style={styles.menuBar}>
         <Text style={styles.title}>🌱 Eco Dashboard</Text>
-        <Ionicons
-          name="menu"
-          size={28}
-          color="#27ae60"
-          onPress={() => setMenuVisible(true)}
-        />
-      </View>
-
-      {/* Dropdown Modal Menu */}
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMenuVisible(false)}
-      >
-        {/* Background overlay to close menu */}
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPressOut={() => setMenuVisible(false)}
-        >
-          <View style={styles.dropdownMenu}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                router.push("/settings");
-              }}
-            >
-              <Ionicons name="settings" size={20} color="#27ae60" />
-              <Text style={styles.menuText}>Settings</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                router.push("/rewards");
-              }}
-            >
-              <FontAwesome name="gift" size={20} color="#27ae60" />
-              <Text style={styles.menuText}>Rewards</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                router.push("/iot-connect");
-              }}
-            >
-              <Ionicons name="hardware-chip" size={20} color="#27ae60" />
-              <Text style={styles.menuText}>IoT Connect</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                router.push("/maps");
-              }}
-            >
-              <FontAwesome name="map" size={20} color="#27ae60" />
-              <Text style={styles.menuText}>Maps</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                router.push("/analysis");
-              }}
-            >
-              <FontAwesome name="line-chart" size={20} color="#27ae60" />
-              <Text style={styles.menuText}>Analysis</Text>
-            </TouchableOpacity>
-          </View>
+        <TouchableOpacity onPress={() => Alert.alert("Add new data", "This feature is coming soon!")}>
+          <Ionicons name="add-circle" size={28} color="#27ae60" />
         </TouchableOpacity>
-      </Modal>
+      </View>
 
       {/* Video Section */}
       <View style={styles.videoBox}>
@@ -186,40 +110,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: { fontSize: 24, fontWeight: "bold", color: "#27ae60" },
-
-  // Overlay
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.2)",
-    justifyContent: "flex-start",
-    alignItems: "flex-end",
-  },
-
-  // Dropdown menu
-  dropdownMenu: {
-    marginTop: 60,
-    marginRight: 12,
-    width: 180,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingVertical: 8,
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  menuText: {
-    fontSize: 15,
-    marginLeft: 10,
-    fontWeight: "500",
-    color: "#333",
-  },
 
   // Video
   videoBox: {

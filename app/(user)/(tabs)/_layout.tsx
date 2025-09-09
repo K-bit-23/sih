@@ -1,18 +1,38 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function TabLayout() {
+  const { colorScheme } = useTheme();
+
+  const colors = {
+    light: {
+      active: '#27ae60',
+      inactive: '#7f8c8d',
+      background: '#ffffff',
+      borderTop: '#ecf0f1',
+    },
+    dark: {
+      active: '#2ecc71',
+      inactive: '#95a5a6',
+      background: '#2c3e50',
+      borderTop: '#34495e',
+    },
+  };
+
+  const currentColors = colors[colorScheme];
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#27ae60',
-        tabBarInactiveTintColor: '#7f8c8d',
+        tabBarActiveTintColor: currentColors.active,
+        tabBarInactiveTintColor: currentColors.inactive,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: currentColors.background,
           borderTopWidth: 1,
-          borderTopColor: '#ecf0f1',
+          borderTopColor: currentColors.borderTop,
           height: 60,
           paddingBottom: 5,
         },

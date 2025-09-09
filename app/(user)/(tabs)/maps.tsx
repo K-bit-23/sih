@@ -7,24 +7,7 @@ import {
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { WebView } from "react-native-webview";
-import * as Location from "expo-location";
-import { useEffect, useState, useCallback } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
-
-// Helper to calculate distance (Haversine formula)
-function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371; // km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
 
 // Open directions
 function openDirections(lat: number, lng: number) {
@@ -39,12 +22,6 @@ function openDirections(lat: number, lng: number) {
 }
 
 export default function MapsScreen() {
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
-    null
-  );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
   // ✅ Tamil Nadu bins
   const bins = [
     { id: 1, name: "Bin - Erode (TN)", lat: 11.341, lng: 77.7172 },
@@ -52,68 +29,11 @@ export default function MapsScreen() {
     { id: 3, name: "Bin - Karur (TN)", lat: 10.9601, lng: 78.0766 },
   ];
 
-  const fetchLocation = useCallback(async () => {
-    setLoading(true);
-    try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("🚫 Location permission denied.");
-        setLocation(null);
-        setLoading(false);
-        return;
-      }
-
-      let currentLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-
-      setLocation({
-        lat: currentLocation.coords.latitude,
-        lng: currentLocation.coords.longitude,
-      });
-      setErrorMsg(null);
-    } catch (err) {
-      setErrorMsg("⚠️ Failed to fetch location.");
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchLocation();
-  }, [fetchLocation]);
-
   // Build OSM URL dynamically with marker
-  const osmUrl = location
-    ? `https://www.openstreetmap.org/export/embed.html?bbox=${
-        location.lng - 0.05
-      },${location.lat - 0.05},${location.lng + 0.05},${
-        location.lat + 0.05
-      }&layer=mapnik&marker=${location.lat},${location.lng}`
-    : null;
+  const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=77.6,10.9,78.1,11.4&layer=mapnik`;
 
   return (
     <View style={styles.container}>
-      {/* Show errors */}
-      {errorMsg ? (
-        <View style={styles.messageBox}>
-          <FontAwesome5 name="exclamation-circle" size={22} color="red" />
-          <Text style={styles.error}>{errorMsg}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={fetchLocation}>
-            <Text style={styles.retryText}>🔄 Retry</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsBtn}
-            onPress={() => Linking.openSettings()}
-          >
-            <Text style={styles.settingsText}>⚙️ Open Settings</Text>
-          </TouchableOpacity>
-        </View>
-      ) : loading ? (
-        <View style={styles.messageBox}>
-          <FontAwesome5 name="spinner" size={20} color="#555" />
-          <Text style={styles.loading}>Fetching your location...</Text>
-        </View>
-      ) : location && osmUrl ? (
         <>
           {/* Map */}
           <View style={styles.mapBox}>
@@ -135,11 +55,6 @@ export default function MapsScreen() {
               showsHorizontalScrollIndicator={false}
             >
               {bins.map((bin) => {
-                const distance =
-                  location &&
-                  getDistance(location.lat, location.lng, bin.lat, bin.lng).toFixed(
-                    2
-                  );
 
                 return (
                   <TouchableOpacity
@@ -149,23 +64,13 @@ export default function MapsScreen() {
                   >
                     <FontAwesome5 name="trash" size={26} color="#27ae60" />
                     <Text style={styles.binName}>{bin.name}</Text>
-                    {distance && (
-                      <Text style={styles.distance}>{distance} km</Text>
-                    )}
                     <Text style={styles.tapText}>➡️ Tap for directions</Text>
                   </TouchableOpacity>
                 );
               })}
             </ScrollView>
           </View>
-
-          {/* Refresh Button */}
-          <TouchableOpacity style={styles.refreshBtn} onPress={fetchLocation}>
-            <FontAwesome5 name="redo" size={20} color="white" />
-            <Text style={styles.refreshText}>Refresh</Text>
-          </TouchableOpacity>
         </>
-      ) : null}
 
       {Platform.OS === "web" && (
         <Text style={styles.webText}>

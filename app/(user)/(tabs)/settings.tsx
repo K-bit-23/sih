@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { StyleSheet, Switch, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Switch, TouchableOpacity, Alert, Image } from 'react-native';
 import { View, Text } from '../../../components/Themed';
 import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function SettingsScreen() {
   const { colorScheme, setColorScheme } = useTheme();
   const { t, setLanguage, locale } = useLanguage();
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const router = useRouter();
 
   const showLanguagePicker = () => {
     Alert.alert(
@@ -31,10 +36,75 @@ export default function SettingsScreen() {
     return t('english');
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      t('logout'),
+      t('logoutMessage'),
+      [
+        {
+          text: t('cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('logout'),
+          onPress: () => router.replace('/sign-in'),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const handleBiometricToggle = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    if (!hasHardware) {
+      Alert.alert(t('error'), t('biometricNotSupported'));
+      return;
+    }
+
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!isEnrolled) {
+      Alert.alert(t('error'), t('biometricNotEnrolled'));
+      return;
+    }
+
+    if (isBiometricEnabled) {
+      setIsBiometricEnabled(false);
+    } else {
+      const { success } = await LocalAuthentication.authenticateAsync({
+        promptMessage: t('authenticate'),
+      });
+
+      if (success) {
+        setIsBiometricEnabled(true);
+      } else {
+        Alert.alert(t('error'), t('authenticationFailed'));
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{t('settings')}</Text>
+
+      {/* Profile Picture Section */}
+      <TouchableOpacity style={styles.profileContainer} onPress={pickImage}>
+        <Image source={{ uri: profileImage || 'https://via.placeholder.com/150' }} style={styles.profileImage} />
+        <Text style={styles.profileText}>{t('changeProfilePicture')}</Text>
+      </TouchableOpacity>
 
       {/* Account Section */}
       <TouchableOpacity style={styles.row} onPress={() => Alert.alert(t('account'), t('account') + ' settings coming soon!')}>
@@ -68,7 +138,7 @@ export default function SettingsScreen() {
         <Switch
           trackColor={{ false: '#767577', true: '#81b0ff' }}
           thumbColor={isBiometricEnabled ? '#f5dd4b' : '#f4f3f4'}
-          onValueChange={() => setIsBiometricEnabled(previousState => !previousState)}
+          onValueChange={handleBiometricToggle}
           value={isBiometricEnabled}
         />
       </View>
@@ -80,7 +150,7 @@ export default function SettingsScreen() {
       </TouchableOpacity>
       
       {/* Logout Button */}
-      <TouchableOpacity style={styles.row} onPress={() => Alert.alert(t('logout'), t('logoutMessage'))}>
+      <TouchableOpacity style={styles.row} onPress={handleLogout}>
         <MaterialCommunityIcons name="logout" size={24} color="#c0392b" />
         <Text style={[styles.label, { color: '#c0392b' }]}>{t('logout')}</Text>
       </TouchableOpacity>
@@ -99,6 +169,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#27ae60',
     marginBottom: 20,
+  },
+  profileContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    borderWidth: 3,
+    borderColor: '#27ae60',
+  },
+  profileText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#27ae60',
+    fontWeight: 'bold',
   },
   row: {
     flexDirection: 'row',
