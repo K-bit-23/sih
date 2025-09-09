@@ -41,15 +41,6 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="iot-connect"
-        options={{
-          title: t("iot"),
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="cloud-queue" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="analysis"
         options={{
           title: t("analysis"),
@@ -74,6 +65,12 @@ const TabLayout = () => {
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings" size={24} color={color} />
           ),
+        }}
+      />
+       <Tabs.Screen
+        name="iot-connect"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

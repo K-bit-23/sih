@@ -1,159 +1,97 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   View as RNView,
-  Alert,
-  Linking,
   ScrollView,
+  Switch,
 } from 'react-native';
 import { View } from '../../../components/Themed';
-import { FontAwesome5 } from '@expo/vector-icons';
-import MapView, { Marker, Region } from 'react-native-maps';
-import * as Location from 'expo-location';
+import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import Colors from '../../../constants/Colors';
+import { useLanguage } from '../../context/LanguageContext';
+import { useColorScheme } from 'react-native';
 import { Link } from 'expo-router';
 
 export default function SettingsScreen() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [region, setRegion] = useState<Region | undefined>(undefined);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { t, language, setLanguage } = useLanguage();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme || 'light'];
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied. Please enable it in your device settings.');
-        return;
-      }
-
-      let currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-      setRegion({
-        latitude: currentLocation.coords.latitude,
-        longitude: currentLocation.coords.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      });
-    })();
-  }, []);
-
-  const handleResetSettings = () => {
-    Alert.alert(
-      'Confirm Reset',
-      'Are you sure you want to reset all settings to their default values?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset',
-          onPress: () => {
-            Alert.alert('Settings Reset', 'All settings have been reset successfully.');
-          },
-          style: 'destructive',
-        },
-      ]
-    );
-  };
-
-  const handleLogout = () => {
-    Alert.alert(
-      'Confirm Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          onPress: () => {
-            // Perform logout action here
-            Alert.alert('Logged Out', 'You have been successfully logged out.');
-          },
-          style: 'destructive',
-        },
-      ]
-    );
-  };
-
-  const openAppSettings = () => {
-    Linking.openSettings();
-  };
-
-  const centerMapOnUser = () => {
-    if (location) {
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      });
-    }
+  // Dummy theme toggle function
+  const toggleColorScheme = () => {
+    // In a real app, you'd update the theme in your theme context
+    console.log('Toggling color scheme');
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Settings</Text>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.primary }]}>
+        <Text style={styles.headerTitle}>{t('settings')}</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Account Actions</Text>
-        <TouchableOpacity style={styles.button} onPress={handleResetSettings}>
-            <FontAwesome5 name="undo" size={20} color="#fff" />
-            <Text style={styles.buttonText}>Reset Settings</Text>
+      {/* Account Section */}
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <Text style={[styles.cardTitle, { color: colors.primary }]}>{t('account')}</Text>
+        <TouchableOpacity style={styles.menuItem}>
+          <FontAwesome5 name="user-circle" size={20} color={colors.text} />
+          <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Profile</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
+        <TouchableOpacity style={styles.menuItem}>
+          <FontAwesome5 name="lock" size={20} color={colors.text} />
+          <Text style={[styles.menuItemText, { color: colors.text }]}>Change Password</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.menuItem, styles.logoutButton]}>
             <FontAwesome5 name="sign-out-alt" size={20} color="#fff" />
-            <Text style={styles.buttonText}>Logout</Text>
+            <Text style={[styles.menuItemText, { color: '#fff' }]}>{t('logout')}</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Device</Text>
-        <Link href="/(user)/(tabs)/iot-connect" asChild>
-            <TouchableOpacity style={styles.button}>
-                <FontAwesome5 name="robot" size={20} color="#fff" />
-                <Text style={styles.buttonText}>Device Connection</Text>
-            </TouchableOpacity>
-        </Link>
+      {/* Appearance Section */}
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <Text style={[styles.cardTitle, { color: colors.primary }]}>Appearance</Text>
+        <View style={styles.menuItem}>
+          <Ionicons name="moon" size={20} color={colors.text} />
+          <Text style={[styles.menuItemText, { color: colors.text }]}>{t('darkMode')}</Text>
+          <Switch
+            value={colorScheme === 'dark'}
+            onValueChange={toggleColorScheme}
+            trackColor={{ false: '#767577', true: colors.accent }}
+            thumbColor={colorScheme === 'dark' ? colors.primary : '#f4f3f4'}
+          />
+        </View>
       </View>
 
-      <View style={styles.card}>
-        <RNView style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.cardTitle}>My Location</Text>
-            <TouchableOpacity onPress={centerMapOnUser}>
-                <FontAwesome5 name="compress-arrows-alt" size={20} color={Colors.light.primary} />
-            </TouchableOpacity>
-        </RNView>
-        {errorMsg ? (
-          <RNView style={styles.locationContainer}>
-            <Text style={styles.errorText}>{errorMsg}</Text>
-            <TouchableOpacity style={styles.settingsBtn} onPress={openAppSettings}>
-              <Text style={styles.settingsText}>Open Settings</Text>
-            </TouchableOpacity>
-          </RNView>
-        ) : region ? (
-          <MapView
-            style={styles.map}
-            region={region}
-            onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
-            showsUserLocation
-            loadingEnabled
-          >
-            {location && <Marker
-              coordinate={{
-                latitude: location!.coords.latitude,
-                longitude: location!.coords.longitude,
-              }}
-              title="You are here"
-              description="Your current location"
-              pinColor={Colors.light.accent}
-            />}
-          </MapView>
-        ) : (
-          <RNView style={styles.locationContainer}>
-            <Text>Fetching your location...</Text>
-          </RNView>
-        )}
+      {/* Language Section */}
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <Text style={[styles.cardTitle, { color: colors.primary }]}>{t('language')}</Text>
+        <TouchableOpacity style={styles.menuItem} onPress={() => setLanguage('en')}>
+          <MaterialIcons name="language" size={20} color={colors.text} />
+          <Text style={[styles.menuItemText, { color: colors.text }]}>{t('english')}</Text>
+          {language === 'en' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={() => setLanguage('hi')}>
+          <MaterialIcons name="language" size={20} color={colors.text} />
+          <Text style={[styles.menuItemText, { color: colors.text }]}>{t('hindi')}</Text>
+          {language === 'hi' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={() => setLanguage('ta')}>
+          <MaterialIcons name="language" size={20} color={colors.text} />
+          <Text style={[styles.menuItemText, { color: colors.text }]}>{t('tamil')}</Text>
+          {language === 'ta' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
+        </TouchableOpacity>
+      </View>
+
+      {/* Device Section */}
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <Text style={[styles.cardTitle, { color: colors.primary }]}>Device</Text>
+        <Link href="/(user)/(tabs)/iot-connect" asChild>
+          <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]}>
+            <FontAwesome5 name="robot" size={20} color="#fff" />
+            <Text style={styles.buttonText}>Connect Device</Text>
+          </TouchableOpacity>
+        </Link>
       </View>
     </ScrollView>
   );
@@ -162,10 +100,8 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
   },
-  headerContainer: {
-    backgroundColor: Colors.light.primary,
+  header: {
     paddingVertical: 20,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 20,
@@ -178,29 +114,43 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   card: {
-    backgroundColor: 'white',
     borderRadius: 12,
     margin: 16,
     padding: 16,
     elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   cardTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 12,
-    color: Colors.light.primary,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  menuItemText: {
+    fontSize: 16,
+    marginLeft: 15,
+    flex: 1,
+  },
+  logoutButton: {
+    backgroundColor: '#e74c3c',
+    borderRadius: 10,
+    padding: 14,
+    justifyContent: 'center',
+    marginTop: 10,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.light.primary,
     paddingVertical: 14,
     borderRadius: 10,
-    marginBottom: 10,
-  },
-  logoutButton: {
-    backgroundColor: '#e74c3c',
+    marginTop: 10,
   },
   buttonText: {
     color: '#fff',
@@ -208,31 +158,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
   },
-  map: {
-    height: 300,
-    borderRadius: 12,
-  },
-  locationContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 300,
-  },
-  errorText: {
-    color: '#d32f2f',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  settingsBtn: {
-    backgroundColor: Colors.light.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  settingsText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
 });
-
