@@ -4,7 +4,6 @@ import {
   StatusBar,
   Dimensions,
   TouchableOpacity,
-  Alert,
   ScrollView,
   RefreshControl,
 } from "react-native";
@@ -126,46 +125,46 @@ export default function DashboardScreen() {
   };
 
   const cards: CardProps[] = [
-    { 
-      title: "Temperature", 
-      value: temperature, 
-      icon: "thermometer-three-quarters", 
-      color: "#FF6B6B",
+    {
+      title: "Temperature",
+      value: temperature,
+      icon: "thermometer-three-quarters",
+      color: Colors.light.primary, // Blue for general info
       trend: "+2°C"
     },
-    { 
-      title: "Humidity", 
-      value: humidity, 
-      icon: "tint", 
-      color: "#4ECDC4",
+    {
+      title: "Humidity",
+      value: humidity,
+      icon: "tint",
+      color: Colors.light.primary, // Blue for general info
       trend: "-5%"
     },
-    { 
-      title: "Air Quality", 
-      value: airQuality, 
-      icon: "leaf", 
-      color: "#45B7D1",
+    {
+      title: "Air Quality",
+      value: airQuality,
+      icon: "leaf",
+      color: Colors.light.accent, // Green for positive metric
       trend: "Good"
     },
-    { 
-      title: "Recyclable", 
-      value: "1.8 kg", 
-      icon: "recycle", 
-      color: "#96CEB4",
+    {
+      title: "Recyclable",
+      value: "1.8 kg",
+      icon: "recycle",
+      color: Colors.light.accent, // Green for positive metric
       trend: "+0.3kg"
     },
-    { 
-      title: "Non-Recyclable", 
-      value: "0.5 kg", 
-      icon: "trash", 
-      color: "#FFEAA7",
+    {
+      title: "Non-Recyclable",
+      value: "0.5 kg",
+      icon: "trash",
+      color: Colors.light.secondary, // Orange for neutral/warning
       trend: "-0.2kg"
     },
-    { 
-      title: "Hazardous", 
-      value: "0.3 kg", 
-      icon: "warning", 
-      color: "#FD79A8",
+    {
+      title: "Hazardous",
+      value: "0.3 kg",
+      icon: "warning",
+      color: Colors.light.danger, // Red for negative metric
       trend: "0kg"
     },
   ];
@@ -216,7 +215,7 @@ export default function DashboardScreen() {
         <View style={styles.headerContent}>
           <View style={styles.headerLeft}>
             <Text style={styles.greeting}>Good Morning! 🌱</Text>
-            <Text style={styles.title}>Eco Dashboard</Text>
+            <Text style={[styles.title, { color: Colors.light.accent }]}>Eco Dashboard</Text>
             {locationEnabled && currentLocation && (
               <View style={styles.locationContainer}>
                 <Ionicons name="location" size={14} color="rgba(255,255,255,0.8)" />
@@ -323,7 +322,6 @@ const styles = StyleSheet.create({
   title: { 
     fontSize: 28, 
     fontWeight: "bold", 
-    color: 'white',
     marginBottom: 4,
   },
   locationContainer: {
