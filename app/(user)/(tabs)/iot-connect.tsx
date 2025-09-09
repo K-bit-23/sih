@@ -29,6 +29,10 @@ export default function IoTConnectScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string | null>(null);
 
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", message: "" });
+  const [tempQrData, setTempQrData] = useState<any>(null);
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
@@ -48,16 +52,25 @@ export default function IoTConnectScreen() {
     try {
       const qrData = JSON.parse(data);
       if (qrData.brokerIP && qrData.deviceName && qrData.subscribeTopic && qrData.publishTopic) {
-        setBrokerIP(qrData.brokerIP);
-        setDeviceName(qrData.deviceName);
-        setSubscribeTopic(qrData.subscribeTopic);
-        setPublishTopic(qrData.publishTopic);
-        Alert.alert("✅ Success", "Device details populated from QR code!");
+        setTempQrData(qrData);
+        setModalContent({
+          title: "QR Code Scanned",
+          message: `Broker IP: ${qrData.brokerIP}\nDevice Name: ${qrData.deviceName}\nSubscribe Topic: ${qrData.subscribeTopic}\nPublish Topic: ${qrData.publishTopic}`
+        });
+        setModalVisible(true);
       } else {
-        Alert.alert("❌ Invalid QR Code", "The QR code does not contain the required IoT device details.");
+        setModalContent({
+          title: "❌ Invalid QR Code",
+          message: "The QR code does not contain the required IoT device details."
+        });
+        setModalVisible(true);
       }
     } catch (error) {
-      Alert.alert("❌ Invalid QR Code", "Failed to parse QR code data. Please ensure it's a valid JSON format.");
+      setModalContent({
+          title: "❌ Invalid QR Code",
+          message: "Failed to parse QR code data. Please ensure it's a valid JSON format."
+      });
+      setModalVisible(true);
     }
   };
 
@@ -69,9 +82,29 @@ export default function IoTConnectScreen() {
 
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
-      Alert.alert("Coming Soon", "QR Code decoding from an uploaded image is coming soon!");
+      setModalContent({
+          title: "Coming Soon",
+          message: "QR Code decoding from an uploaded image is coming soon!"
+      });
+      setModalVisible(true);
     }
   };
+
+  const handleModalConfirm = () => {
+    if (tempQrData) {
+      setBrokerIP(tempQrData.brokerIP);
+      setDeviceName(tempQrData.deviceName);
+      setSubscribeTopic(tempQrData.subscribeTopic);
+      setPublishTopic(tempQrData.publishTopic);
+    }
+    setModalVisible(false);
+    setTempQrData(null);
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    setTempQrData(null);
+  }
 
   if (!permission) {
     // Camera permissions are still loading
@@ -177,6 +210,29 @@ export default function IoTConnectScreen() {
              <Text style={styles.closeButtonText}>Close Scanner</Text>
           </TouchableOpacity>
         </View>
+      </Modal>
+
+      <Modal transparent={true} visible={isModalVisible} animationType="fade">
+        <RNView style={styles.modalContainer}>
+          <RNView style={styles.modalBox}>
+            <Text style={styles.modalTitle}>{modalContent.title}</Text>
+            <Text style={styles.modalMessage}>{modalContent.message}</Text>
+            <View style={styles.modalButtonContainer}>
+              {tempQrData &&
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={handleModalCancel}>
+                  <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              }
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleModalConfirm}>
+                <Text style={styles.modalButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </RNView>
+        </RNView>
       </Modal>
     </View>
   );
@@ -321,5 +377,50 @@ const styles = StyleSheet.create({
   previewText: {
     color: Colors.light.primary,
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalBox: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  modalButton: {
+    backgroundColor: Colors.light.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#e74c3c',
+  },
+  modalButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
