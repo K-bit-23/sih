@@ -16,6 +16,7 @@ import Colors from "../../../constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default function IoTConnectScreen() {
   const [brokerIP, setBrokerIP] = useState("");
@@ -46,10 +47,8 @@ export default function IoTConnectScreen() {
     Alert.alert("✅ Connected", "IoT Device Connected Successfully!");
   };
 
-  const handleBarCodeScanned = ({ data }: { data: string }) => {
-    setScanned(true);
-    setScannerVisible(false);
-    try {
+  const processQrData = (data: string) => {
+     try {
       const qrData = JSON.parse(data);
       if (qrData.brokerIP && qrData.deviceName && qrData.subscribeTopic && qrData.publishTopic) {
         setTempQrData(qrData);
@@ -72,6 +71,12 @@ export default function IoTConnectScreen() {
       });
       setModalVisible(true);
     }
+  }
+
+  const handleBarCodeScanned = ({ data }: { data: string }) => {
+    setScanned(true);
+    setScannerVisible(false);
+    processQrData(data);
   };
 
   const pickImage = async () => {
@@ -81,12 +86,26 @@ export default function IoTConnectScreen() {
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-      setModalContent({
-          title: "Coming Soon",
-          message: "QR Code decoding from an uploaded image is coming soon!"
-      });
-      setModalVisible(true);
+        const uri = result.assets[0].uri;
+        setImage(uri);
+        try {
+            const [barCode] = await BarCodeScanner.scanFromURLAsync(uri);
+            if (barCode && barCode.data) {
+                processQrData(barCode.data);
+            } else {
+                setModalContent({
+                    title: "❌ No QR Code Found",
+                    message: "Could not find a QR code in the selected image."
+                });
+                setModalVisible(true);
+            }
+        } catch (error) {
+            setModalContent({
+                title: "❌ Error",
+                message: "An error occurred while reading the QR code."
+            });
+            setModalVisible(true);
+        }
     }
   };
 
