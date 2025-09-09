@@ -6,12 +6,13 @@ import {
   Alert,
   View as RNView,
   TouchableOpacity,
-  Platform,
+  Modal,
 } from "react-native";
 import { View } from "../../../components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
+import { Camera } from 'expo-camera';
 
 export default function IoTConnectScreen() {
   const [brokerIP, setBrokerIP] = useState("");
@@ -20,9 +21,20 @@ export default function IoTConnectScreen() {
   const [publishTopic, setPublishTopic] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [scanned, setScanned] = useState(false);
+  const [isScannerVisible, setScannerVisible] = useState(false);
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
   }, []);
 
   const handleConnect = () => {
@@ -33,9 +45,34 @@ export default function IoTConnectScreen() {
     Alert.alert("✅ Connected", "IoT Device Connected Successfully!");
   };
 
+  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
+    setScanned(true);
+    setScannerVisible(false);
+    try {
+      const qrData = JSON.parse(data);
+      if (qrData.brokerIP && qrData.deviceName && qrData.subscribeTopic && qrData.publishTopic) {
+        setBrokerIP(qrData.brokerIP);
+        setDeviceName(qrData.deviceName);
+        setSubscribeTopic(qrData.subscribeTopic);
+        setPublishTopic(qrData.publishTopic);
+        Alert.alert("✅ Success", "Device details populated from QR code!");
+      } else {
+        Alert.alert("❌ Invalid QR Code", "The QR code does not contain the required IoT device details.");
+      }
+    } catch (error) {
+      Alert.alert("❌ Invalid QR Code", "Failed to parse QR code data. Please ensure it's a valid JSON format.");
+    }
+  };
+
+  if (hasPermission === null) {
+    return <View style={styles.container}><Text>Requesting for camera permission</Text></View>;
+  }
+  if (hasPermission === false) {
+    return <View style={styles.container}><Text>No access to camera</Text></View>;
+  }
+
   return (
     <View style={styles.container}>
-      {/* Gradient Header */}
       <LinearGradient
         colors={["#27ae60", "#1e8449"]}
         style={styles.header}
@@ -46,13 +83,16 @@ export default function IoTConnectScreen() {
         <Text style={styles.headerTitle}>IoT Connect</Text>
       </LinearGradient>
 
-      {/* Time */}
       <Text style={styles.time}>{currentTime.toLocaleTimeString()}</Text>
 
-      {/* Form Card */}
       <RNView style={styles.card}>
         <Text style={styles.title}>Device Details</Text>
-        <Text style={styles.subtitle}>Enter your IoT device details below.</Text>
+        <Text style={styles.subtitle}>Enter your IoT device details below or scan a QR code.</Text>
+
+        <TouchableOpacity activeOpacity={0.8} style={styles.qrButton} onPress={() => { setScanned(false); setScannerVisible(true); }}>
+          <FontAwesome name="qrcode" size={24} color="#fff" />
+          <Text style={styles.buttonText}>Scan QR Code</Text>
+        </TouchableOpacity>
 
         <TextInput
           style={styles.input}
@@ -91,6 +131,23 @@ export default function IoTConnectScreen() {
           <Text style={styles.buttonText}>🚀 Connect Device</Text>
         </TouchableOpacity>
       </RNView>
+
+      <Modal
+        visible={isScannerVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setScannerVisible(false)}
+      >
+        <View style={styles.scannerContainer}>
+          <Camera
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={StyleSheet.absoluteFillObject}
+          />
+          <TouchableOpacity style={styles.closeButton} onPress={() => setScannerVisible(false)}>
+             <Text style={styles.closeButtonText}>Close Scanner</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -167,9 +224,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 12,
   },
+  qrButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.light.accent,
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
   buttonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+    marginLeft: 10,
+  },
+  scannerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  closeButton: {
+    position: 'absolute',
+    bottom: 50,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    padding: 15,
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: '#000',
+    fontWeight: 'bold',
   },
 });
