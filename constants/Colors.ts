@@ -1,37 +1,37 @@
-const tintColorLight = '#007AFF'; // A brighter, more modern blue
-const tintColorDark = '#FFFFFF';
+const tintColorLight = '#2C9D4B'; // A deep, eco-friendly green
+const tintColorDark = '#FFFFFF'; // White for high contrast on dark backgrounds
 
 export default {
   light: {
-    text: '#000000', // Standard black for readability
-    background: '#F2F2F7', // A light gray for a softer background
+    text: '#000000',
+    background: '#F0F4F0', // A very light, minty green for a fresh background
     tint: tintColorLight,
-    tabIconDefault: '#8E8E93', // A neutral gray for inactive tabs
+    tabIconDefault: '#8E8E93',
     tabIconSelected: tintColorLight,
-    card: '#FFFFFF', // White cards for a clean look
-    cardBorder: '#E5E5EA', // A light border for subtle separation
-    primary: '#007AFF', // A strong blue for primary actions
-    secondary: '#FF9500', // A vibrant orange for secondary actions
-    accent: '#34C759', // A bright green for accents and success states
-    danger: '#FF3B30', // A clear red for warnings and errors
-    active: '#007AFF',
+    card: '#FFFFFF',
+    cardBorder: '#D8E0D8', // A soft green border
+    primary: '#2C9D4B', // Deep, trustworthy green
+    secondary: '#5DBB63', // A brighter, more vibrant green
+    accent: '#87D37C', // A light, friendly green for accents
+    danger: '#FF3B30',
+    active: '#2C9D4B',
     inactive: '#8E8E93',
-    borderTop: '#E5E5EA',
+    borderTop: '#D8E0D8',
   },
   dark: {
-    text: '#FFFFFF', // White text for high contrast
-    background: '#000000', // True black for a deep dark mode
+    text: '#FFFFFF',
+    background: '#001A08', // A very dark, forest green for a deep dark mode
     tint: tintColorDark,
     tabIconDefault: '#8E8E93',
     tabIconSelected: tintColorDark,
-    card: '#1C1C1E', // A dark gray for cards
-    cardBorder: '#38383A', // A subtle border for dark mode cards
-    primary: '#0B84FF', // A slightly brighter blue for dark mode
-    secondary: '#FF9F0A', // A vibrant orange for dark mode
-    accent: '#30D158', // A bright green for dark mode
-    danger: '#FF453A', // A clear red for dark mode
+    card: '#002A10', // A dark, saturated green for cards
+    cardBorder: '#004D20', // A subtle green border for dark mode cards
+    primary: '#34C759', // A bright, vibrant green for dark mode
+    secondary: '#5DBB63', // A medium green that works well on dark backgrounds
+    accent: '#87D37C', // A lighter green for accents
+    danger: '#FF453A',
     active: '#FFFFFF',
     inactive: '#8E8E93',
-    borderTop: '#38383A',
+    borderTop: '#004D20',
   },
 };

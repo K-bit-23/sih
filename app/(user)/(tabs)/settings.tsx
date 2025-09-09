@@ -535,12 +535,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
-    elevation: 5,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
   },
   profileSection: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -559,6 +556,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileInfo: {
+    backgroundColor: 'transparent',
     flex: 1,
   },
   profileName: {
@@ -575,10 +573,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     margin: 16,
     padding: 20,
-    elevation: 4,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
   },
   cardTitle: {
     fontSize: 20,
@@ -586,6 +580,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   menuItem: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
@@ -637,6 +632,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   avatarSection: {
+    backgroundColor: 'transparent',
     alignItems: 'center',
     marginBottom: 30,
   },
@@ -655,6 +651,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   avatarButtons: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     gap: 10,
   },
@@ -672,6 +669,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   formGroup: {
+    backgroundColor: 'transparent',
     marginBottom: 20,
   },
   label: {
@@ -697,7 +695,6 @@ const styles = StyleSheet.create({
     width: '80%',
     borderRadius: 15,
     padding: 20,
-    elevation: 10,
   },
   languageModalTitle: {
     fontSize: 20,
