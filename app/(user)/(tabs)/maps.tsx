@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Platform,
   ScrollView,
   TouchableOpacity,
   Linking,
-  Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
-import MapView, { Marker } from 'react-native-maps';
+import { WebView } from "react-native-webview";
 import { FontAwesome5 } from "@expo/vector-icons";
+import * as Location from 'expo-location';
 import Colors from '@/constants/Colors';
 
 // Open directions
@@ -24,12 +25,10 @@ function openDirections(lat: number, lng: number) {
   });
 }
 
-const { width, height } = Dimensions.get('window');
-const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.5;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
 export default function MapsScreen() {
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   // ✅ Tamil Nadu bins
   const bins = [
     { id: 1, name: "Bin - Erode (TN)", lat: 11.341, lng: 77.7172, type: 'Recyclable' },
@@ -39,12 +38,23 @@ export default function MapsScreen() {
     { id: 5, name: "Bin - Salem (TN)", lat: 11.6643, lng: 78.1460, type: 'Recyclable' },
   ];
 
-  const initialRegion = {
-    latitude: 11.3410,
-    longitude: 77.7172,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  };
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied. Please enable it in your device settings.');
+        return;
+      }
+
+      try {
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      } catch (error) {
+        setErrorMsg('Could not fetch location. Please ensure your GPS is enabled.');
+        console.error("Error fetching location: ", error);
+      }
+    })();
+  }, []);
 
   const getMarkerColor = (type: string) => {
     switch (type) {
@@ -55,33 +65,47 @@ export default function MapsScreen() {
     }
   };
 
-  if (Platform.OS === 'web') {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.webText}>
-          🌍 Native maps are not available on the web. Please use the mobile app to view the map.
-        </Text>
-      </View>
-    );
+  // Build OSM URL
+  let osmUrl = `https://www.openstreetmap.org/export/embed.html?layer=mapnik`;
+  if (location) {
+    const { latitude, longitude } = location.coords;
+    // Create a bounding box around the user's location for a nice zoom level
+    const zoom = 0.02; // Adjust for more or less zoom
+    const bbox = [
+      longitude - zoom,
+      latitude - zoom,
+      longitude + zoom,
+      latitude + zoom,
+    ].join(',');
+    // Add the bounding box and a marker at the user's current location
+    osmUrl += `&bbox=${bbox}&marker=${latitude},${longitude}`;
+  } else {
+    // Default view of Tamil Nadu if location is not available
+    osmUrl += `&bbox=76.5,10.5,79.5,12.5`;
   }
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        initialRegion={initialRegion}
-        showsUserLocation
-      >
-        {bins.map((bin) => (
-          <Marker
-            key={bin.id}
-            coordinate={{ latitude: bin.lat, longitude: bin.lng }}
-            title={bin.name}
-            description={`Type: ${bin.type}`}
-            pinColor={getMarkerColor(bin.type)}
+      <View style={styles.mapContainer}>
+        {errorMsg ? (
+          <View style={styles.messageBox}>
+            <Text style={styles.errorText}>{errorMsg}</Text>
+          </View>
+        ) : !location ? (
+          <View style={styles.messageBox}>
+            <ActivityIndicator size="large" color={Colors.light.primary} />
+            <Text style={styles.loadingText}>Finding your location...</Text>
+          </View>
+        ) : (
+          <WebView
+            source={{ uri: osmUrl }}
+            style={styles.map}
+            javaScriptEnabled
+            domStorageEnabled
+            startInLoadingState
           />
-        ))}
-      </MapView>
+        )}
+      </View>
 
       {/* Bins list */}
       <View style={styles.bottomCardContainer}>
@@ -112,12 +136,33 @@ export default function MapsScreen() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: Colors.light.background,
+    backgroundColor: Colors.light.background 
+  },
+  mapContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f0f4f0', // Match background
   },
   map: { 
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  messageBox: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: Colors.light.text,
+  },
+  errorText: {
+    fontSize: 16,
+    color: Colors.light.danger,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 18,
@@ -131,10 +176,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
     paddingVertical: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingBottom: 20, // Added padding for home indicator
+    paddingBottom: 20,
   },
   binList: { 
     paddingLeft: 10 
@@ -172,11 +217,5 @@ const styles = StyleSheet.create({
     color: Colors.light.secondary,
     fontStyle: "italic",
     textAlign: "center",
-  },
-  webText: {
-    padding: 20,
-    fontSize: 16,
-    textAlign: 'center',
-    color: Colors.light.text,
   },
 });
