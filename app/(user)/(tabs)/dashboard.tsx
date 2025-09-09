@@ -11,6 +11,7 @@ import WasteLogList from "../../../components/WasteLogList";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Video, ResizeMode } from "expo-av";
+import Colors from "../../../constants/Colors";
 
 const wasteLog = [
   { id: "1", type: "Organic", weight: "1.2 kg", date: "2025-09-08" },
@@ -23,11 +24,12 @@ const { width } = Dimensions.get("window");
 interface CardProps {
   title: string;
   value: string;
-  color?: string;
+  icon: React.ComponentProps<typeof FontAwesome>['name'];
 }
 
-const InfoCard = ({ title, value, color }: CardProps) => (
-  <View style={[styles.card, { backgroundColor: color || "#e0f2e9" }]}>
+const InfoCard = ({ title, value, icon }: CardProps) => (
+  <View style={styles.card}>
+    <FontAwesome name={icon} size={24} color={Colors.light.primary} />
     <Text style={styles.cardTitle}>{title}</Text>
     <Text style={styles.cardValue}>{value}</Text>
   </View>
@@ -42,11 +44,11 @@ export default function DashboardScreen() {
   const videoUrl = ""; // set your stream/video URL here
 
   const cards = [
-    { id: "1", title: "Temperature", value: temperature, color: "#FFECB3" },
-    { id: "2", title: "Humidity", value: humidity, color: "#BBDEFB" },
-    { id: "3", title: "Recyclable", value: "1.8 kg", color: "#C8E6C9" },
-    { id: "4", title: "Non-Recyclable", value: "0.5 kg", color: "#FFCDD2" },
-    { id: "5", title: "Hazardous", value: "0.3 kg", color: "#FFE0B2" },
+    { id: "1", title: "Temperature", value: temperature, icon: "thermometer-three-quarters" },
+    { id: "2", title: "Humidity", value: humidity, icon: "tint" },
+    { id: "3", title: "Recyclable", value: "1.8 kg", icon: "recycle" },
+    { id: "4", title: "Non-Recyclable", value: "0.5 kg", icon: "trash" },
+    { id: "5", title: "Hazardous", value: "0.3 kg", icon: "warning" },
   ];
 
   return (
@@ -56,8 +58,8 @@ export default function DashboardScreen() {
       {/* Header */}
       <View style={styles.menuBar}>
         <Text style={styles.title}>🌱 Eco Dashboard</Text>
-        <TouchableOpacity onPress={() => Alert.alert("Add new data", "This feature is coming soon!")}>
-          <Ionicons name="add-circle" size={28} color="#27ae60" />
+        <TouchableOpacity onPress={() => router.push('/(user)/(tabs)/settings')}>
+          <FontAwesome name="user-circle-o" size={28} color={Colors.light.primary} />
         </TouchableOpacity>
       </View>
 
@@ -73,7 +75,7 @@ export default function DashboardScreen() {
           />
         ) : (
           <View style={styles.videoError}>
-            <FontAwesome name="exclamation-triangle" size={30} color="#e74c3c" />
+            <FontAwesome name="exclamation-triangle" size={30} color={Colors.light.danger} />
             <Text style={styles.errorText}>No video available</Text>
           </View>
         )}
@@ -86,7 +88,7 @@ export default function DashboardScreen() {
             key={item.id}
             title={item.title}
             value={item.value}
-            color={item.color}
+            icon={item.icon}
           />
         ))}
       </View>
@@ -98,7 +100,7 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f6fff9" },
+  container: { flex: 1, backgroundColor: Colors.light.background },
 
   // Header
   menuBar: {
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     marginBottom: 12,
   },
-  title: { fontSize: 24, fontWeight: "bold", color: "#27ae60" },
+  title: { fontSize: 24, fontWeight: "bold", color: Colors.light.primary },
 
   // Video
   videoBox: {
@@ -129,28 +131,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fdecea",
+    backgroundColor: Colors.light.card,
     width: "95%",
     borderRadius: 12,
   },
-  errorText: { marginTop: 8, color: "#e74c3c", fontWeight: "600" },
+  errorText: { marginTop: 8, color: Colors.light.danger, fontWeight: "600" },
 
   // Info Cards
   gridContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     paddingHorizontal: 16,
   },
   card: {
-    width: width * 0.44,
+    width: width * 0.4,
+    backgroundColor: Colors.light.card,
     borderRadius: 14,
-    paddingVertical: 20,
+    padding: 16,
     marginBottom: 14,
     alignItems: "center",
     justifyContent: "center",
     elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.light.cardBorder,
   },
-  cardTitle: { fontSize: 16, fontWeight: "700", color: "#145a32" },
-  cardValue: { fontSize: 14, fontWeight: "500", color: "#145a32", marginTop: 6 },
+  cardTitle: { fontSize: 16, fontWeight: "700", color: Colors.light.text, marginTop: 8 },
+  cardValue: { fontSize: 14, fontWeight: "500", color: Colors.light.text, marginTop: 6 },
 });

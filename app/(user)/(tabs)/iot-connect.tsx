@@ -6,10 +6,12 @@ import {
   Alert,
   View as RNView,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { View } from "../../../components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function IoTConnectScreen() {
   const [brokerIP, setBrokerIP] = useState("");
@@ -25,61 +27,68 @@ export default function IoTConnectScreen() {
 
   const handleConnect = () => {
     if (!brokerIP || !deviceName || !subscribeTopic || !publishTopic) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert("⚠️ Missing Info", "Please fill in all fields");
       return;
     }
-    Alert.alert("Success", "IoT Device Connected Successfully!");
+    Alert.alert("✅ Connected", "IoT Device Connected Successfully!");
   };
 
   return (
     <View style={styles.container}>
-      <RNView style={styles.header}>
+      {/* Gradient Header */}
+      <LinearGradient
+        colors={["#27ae60", "#1e8449"]}
+        style={styles.header}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <FontAwesome name="microchip" size={40} color="#fff" />
         <Text style={styles.headerTitle}>IoT Connect</Text>
-      </RNView>
+      </LinearGradient>
 
-      <FontAwesome name="wifi" size={50} color={Colors.light.primary} style={{ marginBottom: 12 }} />
-
+      {/* Time */}
       <Text style={styles.time}>{currentTime.toLocaleTimeString()}</Text>
 
-      <Text style={styles.title}>IoT Device Details</Text>
-      <Text style={styles.subtitle}>Enter your device details below.</Text>
+      {/* Form Card */}
+      <RNView style={styles.card}>
+        <Text style={styles.title}>Device Details</Text>
+        <Text style={styles.subtitle}>Enter your IoT device details below.</Text>
 
-      <RNView style={styles.formContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Broker IP"
-          placeholderTextColor={Colors.light.tabIconDefault}
+          placeholder="🔗 Broker IP"
+          placeholderTextColor="#999"
           value={brokerIP}
           onChangeText={setBrokerIP}
           textAlign="center"
         />
         <TextInput
           style={styles.input}
-          placeholder="Device Name"
-          placeholderTextColor={Colors.light.tabIconDefault}
+          placeholder="📟 Device Name"
+          placeholderTextColor="#999"
           value={deviceName}
           onChangeText={setDeviceName}
           textAlign="center"
         />
         <TextInput
           style={styles.input}
-          placeholder="Subscribe Topic"
-          placeholderTextColor={Colors.light.tabIconDefault}
+          placeholder="📩 Subscribe Topic"
+          placeholderTextColor="#999"
           value={subscribeTopic}
           onChangeText={setSubscribeTopic}
           textAlign="center"
         />
         <TextInput
           style={styles.input}
-          placeholder="Publish Topic"
-          placeholderTextColor={Colors.light.tabIconDefault}
+          placeholder="📤 Publish Topic"
+          placeholderTextColor="#999"
           value={publishTopic}
           onChangeText={setPublishTopic}
           textAlign="center"
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleConnect}>
-          <Text style={styles.buttonText}>Connect Device</Text>
+        <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={handleConnect}>
+          <Text style={styles.buttonText}>🚀 Connect Device</Text>
         </TouchableOpacity>
       </RNView>
     </View>
@@ -89,67 +98,78 @@ export default function IoTConnectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: "#f6fff9",
     alignItems: "center",
-    padding: 24,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
     width: "100%",
+    paddingVertical: 40,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    elevation: 6,
     marginBottom: 20,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: Colors.light.text,
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
+    marginLeft: 10,
   },
   time: {
-    fontSize: 14, 
-    fontWeight: "400", 
-    color: Colors.light.text,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#2c3e50",
     marginBottom: 16,
-    textAlign: "center",
+  },
+  card: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
   },
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: "bold",
     color: Colors.light.primary,
-    marginBottom: 8,
     textAlign: "center",
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: Colors.light.text,
+    fontSize: 14,
+    color: "#7f8c8d",
     textAlign: "center",
-    marginBottom: 20,
-  },
-  formContainer: {
-    width: "100%",
-    alignItems: "center",
+    marginBottom: 16,
   },
   input: {
-    width: "90%",
-    backgroundColor: Colors.light.card,
-    padding: 12,
+    width: "100%",
+    backgroundColor: "#f0f5f1",
+    padding: 14,
     marginBottom: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: Colors.light.cardBorder,
-    color: Colors.light.text,
+    borderColor: "#dcdcdc",
+    color: "#2c3e50",
+    fontSize: 16,
   },
   button: {
-    width: "90%",
+    width: "100%",
     backgroundColor: Colors.light.primary,
-    padding: 14,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 12,
   },
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
 });
