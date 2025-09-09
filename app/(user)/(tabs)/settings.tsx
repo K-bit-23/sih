@@ -9,25 +9,32 @@ import {
   ScrollView,
 } from 'react-native';
 import { View } from '../../../components/Themed';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
+import { FontAwesome5 } from '@expo/vector-icons';
+import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Colors from '../../../constants/Colors';
 
 export default function SettingsScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [region, setRegion] = useState<Region | undefined>(undefined);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+        setErrorMsg('Permission to access location was denied. Please enable it in your device settings.');
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+      setRegion({
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      });
     })();
   }, []);
 
@@ -40,7 +47,6 @@ export default function SettingsScreen() {
         {
           text: 'Reset',
           onPress: () => {
-            // Add your reset logic here
             Alert.alert('Settings Reset', 'All settings have been reset successfully.');
           },
           style: 'destructive',
@@ -51,6 +57,17 @@ export default function SettingsScreen() {
 
   const openAppSettings = () => {
     Linking.openSettings();
+  };
+
+  const centerMapOnUser = () => {
+    if (location) {
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      });
+    }
   };
 
   return (
@@ -68,7 +85,12 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Location</Text>
+        <RNView style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={styles.cardTitle}>My Location</Text>
+            <TouchableOpacity onPress={centerMapOnUser}>
+                <FontAwesome5 name="compress-arrows-alt" size={20} color={Colors.light.primary} />
+            </TouchableOpacity>
+        </RNView>
         {errorMsg ? (
           <RNView style={styles.locationContainer}>
             <Text style={styles.errorText}>{errorMsg}</Text>
@@ -76,27 +98,27 @@ export default function SettingsScreen() {
               <Text style={styles.settingsText}>Open Settings</Text>
             </TouchableOpacity>
           </RNView>
-        ) : location ? (
+        ) : region ? (
           <MapView
             style={styles.map}
-            initialRegion={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
+            region={region}
+            onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
+            showsUserLocation
+            loadingEnabled
           >
-            <Marker
+            {location && <Marker
               coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
+                latitude: location!.coords.latitude,
+                longitude: location!.coords.longitude,
               }}
-              title="Your Location"
-            />
+              title="You are here"
+              description="Your current location"
+              pinColor={Colors.light.accent}
+            />}
           </MapView>
         ) : (
           <RNView style={styles.locationContainer}>
-            <Text>Loading location...</Text>
+            <Text>Fetching your location...</Text>
           </RNView>
         )}
       </View>
