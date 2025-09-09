@@ -13,13 +13,16 @@ interface LanguageContextType {
 }
 
 const i18n = new I18n({ en, ta, hi });
-i18n.locale = Localization.locale;
+
+const deviceLocale = Localization.getLocales()[0]?.languageCode || 'en';
+
+i18n.locale = deviceLocale;
 i18n.enableFallback = true;
 
 export const LanguageContext = createContext<LanguageContextType>({} as LanguageContextType);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [locale, setLocale] = useState(Localization.locale);
+  const [locale, setLocale] = useState(deviceLocale);
 
   const setLanguage = (lang: string) => {
     i18n.locale = lang;
