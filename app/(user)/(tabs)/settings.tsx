@@ -1,174 +1,316 @@
-import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View as RNView,
-  Alert,
-  Linking,
-  ScrollView,
-} from 'react-native';
-import { View } from '../../../components/Themed';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
-import Colors from '../../../constants/Colors';
+
+import React, { useState } from 'react';
+import { StyleSheet, Switch, TouchableOpacity, Alert, Image, Modal, View as RNView } from 'react-native';
+import { View, Text } from '../../../components/Themed';
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function SettingsScreen() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { colorScheme, setColorScheme } = useTheme();
+  const { t, setLanguage, locale } = useLanguage();
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const [isLocationEnabled, setIsLocationEnabled] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isAccountMenuVisible, setAccountMenuVisible] = useState(false);
+  const router = useRouter();
+  const [tabVisibility, setTabVisibility] = useState({
+    dashboard: true,
+    waste: true,
+    connect: true,
+    analytics: true,
+  });
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
-
-  const handleResetSettings = () => {
+  const showLanguagePicker = () => {
     Alert.alert(
-      'Confirm Reset',
-      'Are you sure you want to reset all settings to their default values?',
+      t('languageSelection'),
+      t('chooseLanguage'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset',
-          onPress: () => {
-            // Add your reset logic here
-            Alert.alert('Settings Reset', 'All settings have been reset successfully.');
-          },
-          style: 'destructive',
-        },
-      ]
+        { text: t('english'), onPress: () => setLanguage('en') },
+        { text: t('tamil'), onPress: () => setLanguage('ta') },
+        { text: t('hindi'), onPress: () => setLanguage('hi') },
+        { text: t('cancel'), style: 'cancel' },
+      ],
+      { cancelable: true }
     );
   };
 
-  const openAppSettings = () => {
-    Linking.openSettings();
+  const getLanguageName = (locale: string) => {
+    if (locale.startsWith('en')) return t('english');
+    if (locale.startsWith('ta')) return t('tamil');
+    if (locale.startsWith('hi')) return t('hindi');
+    return t('english');
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      t('logout'),
+      t('logoutMessage'),
+      [
+        {
+          text: t('cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('logout'),
+          onPress: () => router.replace('/sign-in'),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const handleBiometricToggle = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    if (!hasHardware) {
+      Alert.alert(t('error'), t('biometricNotSupported'));
+      return;
+    }
+
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!isEnrolled) {
+      Alert.alert(t('error'), t('biometricNotEnrolled'));
+      return;
+    }
+
+    if (isBiometricEnabled) {
+      setIsBiometricEnabled(false);
+    } else {
+      const { success } = await LocalAuthentication.authenticateAsync({
+        promptMessage: t('authenticate'),
+      });
+
+      if (success) {
+        setIsBiometricEnabled(true);
+      } else {
+        Alert.alert(t('error'), t('authenticationFailed'));
+      }
+    }
+  };
+
+  const handleLocationToggle = () => {
+    setIsLocationEnabled(previousState => !previousState);
+    Alert.alert(
+      isLocationEnabled ? t('disableLocation') : t('enableLocation'),
+      isLocationEnabled ? t('locationDisabledMessage') : t('locationEnabledMessage')
+    );
+  };
+
+  const handleAccountSettings = () => {
+    setAccountMenuVisible(true);
+  }
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Settings</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>{t('settings')}</Text>
+
+      {/* Profile Picture Section */}
+      <TouchableOpacity style={styles.profileContainer} onPress={pickImage}>
+        <Image source={{ uri: profileImage || 'https://via.placeholder.com/150' }} style={styles.profileImage} />
+        <Text style={styles.profileText}>{t('changeProfilePicture')}</Text>
+      </TouchableOpacity>
+
+      {/* Account Section */}
+      <TouchableOpacity style={styles.row} onPress={handleAccountSettings}>
+        <MaterialCommunityIcons name="account-circle-outline" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('account')}</Text>
+      </TouchableOpacity>
+
+      {/* Account Settings Modal */}
+      <Modal
+        transparent={true}
+        visible={isAccountMenuVisible}
+        animationType="fade"
+        onRequestClose={() => setAccountMenuVisible(false)} >
+        <RNView style={styles.modalContainer}>
+            <RNView style={styles.modalBox}>
+                <TouchableOpacity style={styles.modalButton} onPress={() => {setAccountMenuVisible(false); Alert.alert("Edit Username", "Coming soon!")}}>
+                    <Text style={styles.modalButtonText}>Edit Username</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={() => {setAccountMenuVisible(false); Alert.alert("Change Password", "Coming soon!")}}>
+                    <Text style={styles.modalButtonText}>Change Password</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={() => {setAccountMenuVisible(false); Alert.alert("More", "Coming soon!")}}>
+                    <Text style={styles.modalButtonText}>More</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.modalButton, {backgroundColor: '#c0392b'}]} onPress={() => setAccountMenuVisible(false)}>
+                    <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+            </RNView>
+        </RNView>
+      </Modal>
+
+      {/* Language Selection */}
+      <TouchableOpacity style={styles.row} onPress={showLanguagePicker}>
+        <Ionicons name="language" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('language')}</Text>
+        <Text style={styles.value}>{getLanguageName(locale)}</Text>
+      </TouchableOpacity>
+
+      {/* Dark Mode Toggle */}
+      <View style={styles.row}>
+        <FontAwesome name={colorScheme === 'dark' ? 'moon-o' : 'sun-o'} size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('darkMode')}</Text>
+        <Switch
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={colorScheme === 'dark' ? '#f5dd4b' : '#f4f3f4'}
+          onValueChange={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
+          value={colorScheme === 'dark'}
+        />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>General Settings</Text>
-        <TouchableOpacity style={styles.menuItem} onPress={handleResetSettings}>
-            <FontAwesome5 name="undo" size={20} color={Colors.light.primary} />
-            <Text style={styles.menuText}>Reset Settings</Text>
-        </TouchableOpacity>
+      {/* Enable Biometric Support */}
+      <View style={styles.row}>
+        <MaterialCommunityIcons name="fingerprint" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('enableBiometric')}</Text>
+        <Switch
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={isBiometricEnabled ? '#f5dd4b' : '#f4f3f4'}
+          onValueChange={handleBiometricToggle}
+          value={isBiometricEnabled}
+        />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Location</Text>
-        {errorMsg ? (
-          <RNView style={styles.locationContainer}>
-            <Text style={styles.errorText}>{errorMsg}</Text>
-            <TouchableOpacity style={styles.settingsBtn} onPress={openAppSettings}>
-              <Text style={styles.settingsText}>Open Settings</Text>
-            </TouchableOpacity>
-          </RNView>
-        ) : location ? (
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              }}
-              title="Your Location"
-            />
-          </MapView>
-        ) : (
-          <RNView style={styles.locationContainer}>
-            <Text>Loading location...</Text>
-          </RNView>
-        )}
+      {/* Enable Location */}
+      <View style={styles.row}>
+        <MaterialCommunityIcons name="map-marker" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('enableLocation')}</Text>
+        <Switch
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={isLocationEnabled ? '#f5dd4b' : '#f4f3f4'}
+          onValueChange={handleLocationToggle}
+          value={isLocationEnabled}
+        />
       </View>
-    </ScrollView>
+
+      {/* Tab Bar Customization */}
+      <View style={styles.row}>
+        <Ionicons name="options" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('customizeTabs')}</Text>
+      </View>
+
+      {Object.keys(tabVisibility).map((tab) => (
+        <View key={tab} style={styles.subRow}>
+          <Text style={styles.subLabel}>{t(tab)}</Text>
+          <Switch
+            value={tabVisibility[tab as keyof typeof tabVisibility]}
+            onValueChange={(value) => setTabVisibility({ ...tabVisibility, [tab]: value })}
+          />
+        </View>
+      ))}
+
+      {/* Logout Button */}
+      <TouchableOpacity style={styles.row} onPress={handleLogout}>
+        <MaterialCommunityIcons name="logout" size={24} color="#c0392b" />
+        <Text style={[styles.label, { color: '#c0392b' }]}>{t('logout')}</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
+    padding: 20,
+    backgroundColor: '#f6fff9',
   },
-  headerContainer: {
-    backgroundColor: Colors.light.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  headerTitle: {
-    fontSize: 26,
+  header: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
+    color: '#27ae60',
+    marginBottom: 20,
   },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    margin: 16,
-    padding: 16,
-    elevation: 4,
+  profileContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  cardTitle: {
-    fontSize: 20,
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    borderWidth: 3,
+    borderColor: '#27ae60',
+  },
+  profileText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#27ae60',
     fontWeight: 'bold',
-    marginBottom: 12,
-    color: Colors.light.primary,
   },
-  menuItem: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ecf0f1',
   },
-  menuText: {
-    fontSize: 18,
-    marginLeft: 16,
-    color: '#333',
-  },
-  map: {
-    height: 300,
-    borderRadius: 12,
-  },
-  locationContainer: {
+  subRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    height: 300,
-  },
-  errorText: {
-    color: '#d32f2f',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  settingsBtn: {
-    backgroundColor: Colors.light.primary,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingLeft: 40, // Indent sub-rows
+    borderBottomWidth: 1,
+    borderBottomColor: '#ecf0f1',
   },
-  settingsText: {
-    color: 'white',
+  label: {
+    fontSize: 18,
+    marginLeft: 15,
+    color: '#333',
+    flex: 1,
+  },
+  subLabel: {
     fontSize: 16,
-    fontWeight: 'bold',
+    marginLeft: 15,
+    color: '#555',
+    flex: 1,
+  },
+  value: {
+    fontSize: 18,
+    color: '#7f8c8d',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 16,
+    alignItems: "center",
+    elevation: 10,
+  },
+  modalButton: {
+    backgroundColor: "#43a047",
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center'
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
