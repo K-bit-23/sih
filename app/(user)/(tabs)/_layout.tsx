@@ -2,8 +2,8 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useColorScheme } from "react-native";
-import Colors from "@/constants/Colors";
-import { useLanguage } from "@/context/LanguageContext";
+import Colors from "../../../constants/Colors";
+import { useLanguage } from "../../context/LanguageContext";
 
 const TabLayout = () => {
   const colorScheme = useColorScheme();
