@@ -39,5 +39,11 @@
   "successfullyConnectedToDevice": "डिवाइस से सफलतापूर्वक कनेक्ट किया गया: {{device}}",
   "noQRCodeFound": "चुनी गई छवि में कोई क्यूआर कोड नहीं मिला।",
   "error": "त्रुटि",
-  "couldNotScanQRCode": "छवि से क्यूआर कोड स्कैन नहीं किया जा सका।"
+  "couldNotScanQRCode": "छवि से क्यूआर कोड स्कैन नहीं किया जा सका।",
+  "enterDeviceDetails": "नीचे अपने डिवाइस का विवरण दर्ज करें",
+  "deviceId": "डिवाइस आईडी",
+  "wifiSsid": "वाई-फाई SSID",
+  "wifiPassword": "वाई-फाई पासवर्ड",
+  "connect": "कनेक्ट",
+  "fillAllFields": "कृपया सभी फ़ील्ड भरें"
 }

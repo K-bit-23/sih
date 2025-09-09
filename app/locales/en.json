@@ -39,5 +39,11 @@
   "successfullyConnectedToDevice": "Successfully connected to device: {{device}}",
   "noQRCodeFound": "No QR code found in the selected image.",
   "error": "Error",
-  "couldNotScanQRCode": "Could not scan the QR code from the image."
+  "couldNotScanQRCode": "Could not scan the QR code from the image.",
+  "enterDeviceDetails": "Enter your device details below",
+  "deviceId": "Device ID",
+  "wifiSsid": "Wi-Fi SSID",
+  "wifiPassword": "Wi-Fi Password",
+  "connect": "Connect",
+  "fillAllFields": "Please fill in all fields"
 }
