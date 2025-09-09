@@ -27,5 +27,17 @@
   "dashboard": "டாஷ்போர்டு",
   "iot": "IoT",
   "maps": "வரைபடங்கள்",
-  "rewards": "வெகுமதிகள்"
+  "rewards": "வெகுமதிகள்",
+  "connectToYourDevice": "உங்கள் IoT சாதனத்துடன் இணைக்கவும்",
+  "scanQRCodeToGetStarted": "தொடங்குவதற்கு உங்கள் சாதனத்தில் உள்ள QR குறியீட்டை ஸ்கேன் செய்யவும்",
+  "requestingCameraPermission": "கேமரா அனுமதிக்குக் கோரப்படுகிறது",
+  "noCameraAccess": "கேமராவிற்கு அணுகல் இல்லை",
+  "scanFromGallery": "கேலரியில் இருந்து ஸ்கேன் செய்யவும்",
+  "connecting": "இணைக்கிறது...",
+  "deviceConnected": "சாதனம் இணைக்கப்பட்டது!",
+  "connectAnotherDevice": "மற்றொரு சாதனத்தை இணைக்கவும்",
+  "successfullyConnectedToDevice": "சாதனத்துடன் வெற்றிகரமாக இணைக்கப்பட்டது: {{device}}",
+  "noQRCodeFound": "தேர்ந்தெடுக்கப்பட்ட படத்தில் QR குறியீடு எதுவும் இல்லை.",
+  "error": "பிழை",
+  "couldNotScanQRCode": "படத்திலிருந்து QR குறியீட்டை ஸ்கேன் செய்ய முடியவில்லை."
 }

@@ -10,13 +10,14 @@ import {
   Easing,
   Platform,
 } from 'react-native';
-import { View } from '@/components/Themed';
+import { View } from '../../../components/Themed';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
+import Colors from '../../../constants/Colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function IoTConnectScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -24,6 +25,7 @@ export default function IoTConnectScreen() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connected, setConnected] = useState(false);
   const animation = useRef(new Animated.Value(0)).current;
+  const { t } = useLanguage();
 
   useEffect(() => {
     (async () => {
@@ -41,7 +43,7 @@ export default function IoTConnectScreen() {
     setTimeout(() => {
       setIsConnecting(false);
       setConnected(true);
-      Alert.alert('Device Connected!', `Successfully connected to device: ${data}`)
+      Alert.alert(t('deviceConnected'), t('successfullyConnectedToDevice', { device: data }))
     }, 2000);
   };
 
@@ -58,18 +60,18 @@ export default function IoTConnectScreen() {
       if (Platform.OS === 'web' && result.assets[0].base64) {
         // Barcode scanner for web needs a different approach
         // This is a placeholder for web-based QR code scanning
-        Alert.alert("QR Code Scanning on web is not supported in this example.");
+        Alert.alert(t('error'), t('couldNotScanQRCode'));
       } else if (fileUri) {
         try {
             const scannedResults = await BarCodeScanner.scanFromURLAsync(fileUri);
             if (scannedResults.length > 0) {
                 handleBarCodeScanned(scannedResults[0]);
             } else {
-                Alert.alert("No QR code found in the selected image.");
+                Alert.alert(t('noQRCodeFound'));
             }
         } catch (error) {
             console.error("Error scanning QR code from image: ", error);
-            Alert.alert("Error", "Could not scan the QR code from the image.");
+            Alert.alert(t('error'), t('couldNotScanQRCode'));
         }
       }
     }
@@ -100,10 +102,10 @@ export default function IoTConnectScreen() {
   });
 
   if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+    return <Text>{t('requestingCameraPermission')}</Text>;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return <Text>{t('noCameraAccess')}</Text>;
   }
 
   return (
@@ -112,8 +114,8 @@ export default function IoTConnectScreen() {
         colors={[Colors.light.primary, Colors.light.accent]} // Use your theme colors
         style={styles.header}
       >
-        <Text style={styles.headerText}>Connect to Your IoT Device</Text>
-        <Text style={styles.subHeaderText}>Scan the QR code on your device to get started</Text>
+        <Text style={styles.headerText}>{t('connectToYourDevice')}</Text>
+        <Text style={styles.subHeaderText}>{t('scanQRCodeToGetStarted')}</Text>
       </LinearGradient>
 
       <View style={styles.scannerContainer}>
@@ -129,23 +131,23 @@ export default function IoTConnectScreen() {
       <View style={styles.footer}>
         <TouchableOpacity style={styles.galleryButton} onPress={pickImage}>
           <FontAwesome5 name="images" size={24} color="white" />
-          <Text style={styles.galleryButtonText}>Scan from Gallery</Text>
+          <Text style={styles.galleryButtonText}>{t('scanFromGallery')}</Text>
         </TouchableOpacity>
       </View>
 
       {isConnecting && (
         <View style={styles.overlay}>
           <MaterialCommunityIcons name="lan-connect" size={60} color="white" />
-          <Text style={styles.overlayText}>Connecting...</Text>
+          <Text style={styles.overlayText}>{t('connecting')}</Text>
         </View>
       )}
 
       {connected && (
         <View style={[styles.overlay, styles.successOverlay]}>
           <FontAwesome5 name="check-circle" size={60} color="white" />
-          <Text style={styles.overlayText}>Device Connected!</Text>
+          <Text style={styles.overlayText}>{t('deviceConnected')}</Text>
           <TouchableOpacity style={styles.tryAgainButton} onPress={() => { setConnected(false); setScanned(false); }}>
-            <Text style={styles.tryAgainButtonText}>Connect Another Device</Text>
+            <Text style={styles.tryAgainButtonText}>{t('connectAnotherDevice')}</Text>
           </TouchableOpacity>
         </View>
       )}

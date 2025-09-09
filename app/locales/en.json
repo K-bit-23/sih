@@ -27,5 +27,17 @@
   "dashboard": "Dashboard",
   "iot": "IoT",
   "maps": "Maps",
-  "rewards": "Rewards"
+  "rewards": "Rewards",
+  "connectToYourDevice": "Connect to Your IoT Device",
+  "scanQRCodeToGetStarted": "Scan the QR code on your device to get started",
+  "requestingCameraPermission": "Requesting for camera permission",
+  "noCameraAccess": "No access to camera",
+  "scanFromGallery": "Scan from Gallery",
+  "connecting": "Connecting...",
+  "deviceConnected": "Device Connected!",
+  "connectAnotherDevice": "Connect Another Device",
+  "successfullyConnectedToDevice": "Successfully connected to device: {{device}}",
+  "noQRCodeFound": "No QR code found in the selected image.",
+  "error": "Error",
+  "couldNotScanQRCode": "Could not scan the QR code from the image."
 }
