@@ -1,32 +1,32 @@
 
-const tintColorLight = '#007AFF';
+const tintColorLight = '#43a047';
 const tintColorDark = '#FFFFFF';
 
 export default {
   light: {
-    text: '#000000',
-    background: '#FFFFFF',
+    text: '#1b5e20',
+    background: '#e9f7ef',
     tint: tintColorLight,
-    tabIconDefault: '#CCCCCC',
+    tabIconDefault: '#7fbf7f',
     tabIconSelected: tintColorLight,
-    card: '#F8F8F8',
-    cardBorder: '#E5E5E5',
-    primary: '#007AFF',
-    secondary: '#4CD964',
-    accent: '#FF9500',
-    danger: '#FF3B30',
+    card: '#ffffff',
+    cardBorder: '#a5d6a7',
+    primary: '#43a047',
+    secondary: '#81c784',
+    accent: '#66bb6a',
+    danger: '#e57373',
   },
   dark: {
-    text: '#FFFFFF',
-    background: '#000000',
+    text: '#e8f5e9',
+    background: '#121212',
     tint: tintColorDark,
-    tabIconDefault: '#CCCCCC',
+    tabIconDefault: '#a5d6a7',
     tabIconSelected: tintColorDark,
-    card: '#1C1C1E',
-    cardBorder: '#2C2C2E',
-    primary: '#0A84FF',
-    secondary: '#30D158',
-    accent: '#FF9F0A',
-    danger: '#FF453A',
+    card: '#2e7d32',
+    cardBorder: '#1b5e20',
+    primary: '#66bb6a',
+    secondary: '#a5d6a7',
+    accent: '#81c784',
+    danger: '#ef9a9a',
   },
 };

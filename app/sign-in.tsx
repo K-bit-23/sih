@@ -21,20 +21,15 @@ export default function SignInScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
-  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false); // This should be loaded from a shared storage
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
 
   useEffect(() => {
-    // In a real app, you would load this from AsyncStorage or a global state management solution
-    // For this example, we'll just keep it in the component's state.
-    // We will assume that the user has enabled it in the settings page.
     checkBiometricAvailability();
   }, []);
 
   const checkBiometricAvailability = async () => {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-    // For the purpose of this demo, we'll just assume biometric is enabled if available.
-    // In a real app, this would be tied to the switch in the settings page.
     if (hasHardware && isEnrolled) {
         setIsBiometricEnabled(true);
     }
@@ -53,7 +48,7 @@ export default function SignInScreen() {
 
       if (success) {
         showAlert("Biometric Login Successful", "Welcome back!");
-        router.replace("/dashboard" as any);
+        router.replace("/(user)/(tabs)/dashboard" as any);
       } else {
         showAlert("Biometric Login Failed", "Please try again.");
       }
@@ -61,7 +56,6 @@ export default function SignInScreen() {
       showAlert("Error", "An error occurred during biometric authentication.");
     }
   };
-
 
   const handleSignIn = () => {
     if (email === "" || password === "") {
@@ -72,14 +66,20 @@ export default function SignInScreen() {
     if (role === "admin") {
       if (email === "admin" && password === "admin") {
         showAlert("👨‍💻 Admin Login", "Welcome back, Admin!");
-        router.replace("/admin" as any);
+        router.replace("/(admin)" as any);
       } else {
         showAlert("Login Failed", "Invalid admin credentials.");
       }
     } else {
       showAlert("🙋‍♂️ User Login", "Welcome back, User!");
-      router.replace("/dashboard" as any);
+      router.replace("/(user)/(tabs)/dashboard" as any);
     }
+  };
+
+  const handleGoogleSignIn = () => {
+    // In a real app, you would integrate with a library like @react-native-google-signin/google-signin
+    // For now, we'll just show an alert.
+    showAlert("Google Sign-In", "This feature is under development. Coming soon!");
   };
 
   const showAlert = (title: string, message: string) => {
@@ -95,7 +95,6 @@ export default function SignInScreen() {
         {role === "admin" ? "Sign in as Admin" : "Sign in as User"}
       </Text>
 
-      {/* Role Toggle */}
       <View style={styles.roleToggle}>
         <TouchableOpacity
           style={[styles.toggleButton, role === "user" && styles.activeButton]}
@@ -125,7 +124,6 @@ export default function SignInScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Email Input */}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -136,7 +134,6 @@ export default function SignInScreen() {
         placeholderTextColor="#7fbf7f"
       />
 
-      {/* Password Input */}
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -146,7 +143,6 @@ export default function SignInScreen() {
         placeholderTextColor="#7fbf7f"
       />
 
-      {/* Forgot Password */}
       <TouchableOpacity
         style={styles.forgotPassword}
         onPress={() => showAlert("🔑 Forgot Password", "Password recovery coming soon!")}
@@ -154,22 +150,19 @@ export default function SignInScreen() {
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
 
-      {/* Sign-In Button */}
       <TouchableOpacity style={styles.button} onPress={handleSignIn}>
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
 
-      {/* Biometric Button */}
       {isBiometricEnabled && (
         <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricSignIn}>
           <Ionicons name="finger-print" size={32} color="#43a047" />
         </TouchableOpacity>
       )}
 
-      {/* Google Icon */}
       <TouchableOpacity
         style={styles.googleIconButton}
-        onPress={() => showAlert("🔗 Google Login", "Google sign-in coming soon!")}
+        onPress={handleGoogleSignIn}
       >
         <Image
           source={require("../assets/images/google.png")}
@@ -177,7 +170,6 @@ export default function SignInScreen() {
         />
       </TouchableOpacity>
 
-      {/* Sign-Up Navigation */}
       <Text style={styles.signUpText}>
         Don't have an account?{" "}
         <Text
@@ -188,7 +180,6 @@ export default function SignInScreen() {
         </Text>
       </Text>
 
-      {/* Custom Alert Modal */}
       <Modal transparent={true} visible={alertVisible} animationType="fade">
         <RNView style={styles.modalContainer}>
           <RNView style={styles.modalBox}>
