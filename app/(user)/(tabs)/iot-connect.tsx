@@ -10,14 +10,14 @@ import {
   Easing,
   Platform,
 } from 'react-native';
-import { View } from '../../components/Themed';
+import { View } from '../../../components/Themed';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import Colors from '../../constants/Colors';
+import Colors from '../../../constants/Colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function IoTConnectScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
