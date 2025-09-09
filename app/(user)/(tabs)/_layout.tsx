@@ -1,37 +1,23 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useColorScheme } from "react-native";
-import Colors from "../../../constants/Colors";
+import Colors from "../../constants/Colors";
+import { useLanguage } from "../../context/LanguageContext";
 
-const Layout = () => {
+const TabLayout = () => {
   const colorScheme = useColorScheme();
-
-  const theme = {
-    light: {
-      active: Colors.light.primary,
-      inactive: "#A1A1A1",
-      background: "#FFFFFF",
-      borderTop: "#EEEEEE",
-    },
-    dark: {
-      active: Colors.dark.primary,
-      inactive: "#A1A1A1",
-      background: "#000000",
-      borderTop: "#222222",
-    },
-  };
-
-  const currentTheme = theme[colorScheme || "light"];
+  const { t } = useLanguage();
+  const colors = Colors[colorScheme || "light"];
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: currentTheme.active,
-        tabBarInactiveTintColor: currentTheme.inactive,
+        tabBarActiveTintColor: colors.active,
+        tabBarInactiveTintColor: colors.inactive,
         tabBarStyle: {
-          backgroundColor: currentTheme.background,
-          borderTopColor: currentTheme.borderTop,
+          backgroundColor: colors.background,
+          borderTopColor: colors.borderTop,
         },
         headerShown: false,
       }}
@@ -39,45 +25,54 @@ const Layout = () => {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: "Dashboard",
+          title: t("dashboard"),
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="home" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="rewards"
-        options={{
-          title: "Rewards",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="gift" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="iot-connect"
-        options={{
-          title: "IoT Connect",
-          tabBarIcon: ({ color }) => (
-            <Ionicons size={28} name="hardware-chip" color={color} />
+            <Ionicons name="grid" size={24} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="maps"
         options={{
-          title: "Maps",
+          title: t("maps"),
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="map" color={color} />
+            <FontAwesome name="map-marker" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="iot-connect"
+        options={{
+          title: t("connect"),
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="cloud-queue" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="analysis"
+        options={{
+          title: t("analysis"),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="analytics" size={24} color={color} />
+          ),
+        }}
+      />
+       <Tabs.Screen
+        name="rewards"
+        options={{
+          title: t("rewards"),
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="trophy" size={24} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: t("settings"),
           tabBarIcon: ({ color }) => (
-            <Ionicons size={28} name="settings" color={color} />
+            <Ionicons name="settings" size={24} color={color} />
           ),
         }}
       />
@@ -85,4 +80,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default TabLayout;

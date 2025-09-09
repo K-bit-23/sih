@@ -12,7 +12,7 @@ import {
 import { View, Text } from "@/components/Themed";
 import * as ImagePicker from "expo-image-picker";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import Colors from "../../../constants/Colors";
+import Colors from "@/constants/Colors";
 
 const leaderboardData = [
   { id: "1", rank: 1, user: "GreenWarrior", points: 2500 },

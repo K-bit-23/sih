@@ -7,12 +7,12 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import { View, Text } from "../../../components/Themed";
-import WasteLogList from "../../../components/WasteLogList";
+import { View, Text } from "@/components/Themed";
+import WasteLogList from "@/components/WasteLogList";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Video, ResizeMode } from "expo-av";
-import Colors from "../../../constants/Colors";
+import Colors from "@/constants/Colors";
 
 const wasteLog = [
   { id: "1", type: "Organic", weight: "1.2 kg", date: "2025-09-08" },
@@ -23,13 +23,6 @@ const wasteLog = [
 const { width } = Dimensions.get("window");
 
 interface CardProps {
-  title: string;
-  value: string;
-  icon: React.ComponentProps<typeof FontAwesome>['name'];
-}
-
-interface CardData {
-  id: string;
   title: string;
   value: string;
   icon: React.ComponentProps<typeof FontAwesome>['name'];
@@ -50,12 +43,12 @@ export default function DashboardScreen() {
   const [humidity] = useState("65%");
   const videoUrl = "";
 
-  const cards: CardData[] = [
-    { id: "1", title: "Temperature", value: temperature, icon: "thermometer-three-quarters" },
-    { id: "2", title: "Humidity", value: humidity, icon: "tint" },
-    { id: "3", title: "Recyclable", value: "1.8 kg", icon: "recycle" },
-    { id: "4", title: "Non-Recyclable", value: "0.5 kg", icon: "trash" },
-    { id: "5", title: "Hazardous", value: "0.3 kg", icon: "warning" },
+  const cards: CardProps[] = [
+    { title: "Temperature", value: temperature, icon: "thermometer-three-quarters" },
+    { title: "Humidity", value: humidity, icon: "tint" },
+    { title: "Recyclable", value: "1.8 kg", icon: "recycle" },
+    { title: "Non-Recyclable", value: "0.5 kg", icon: "trash" },
+    { title: "Hazardous", value: "0.3 kg", icon: "warning" },
   ];
 
   return (
@@ -87,9 +80,9 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.gridContainer}>
-        {cards.map((item) => (
+        {cards.map((item, index) => (
           <InfoCard
-            key={item.id}
+            key={index}
             title={item.title}
             value={item.value}
             icon={item.icon}
