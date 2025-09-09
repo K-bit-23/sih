@@ -9,11 +9,9 @@ import {
 } from "react-native";
 import { View } from "../../../components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import Colors from "../../../constants/Colors";
 
 export default function IoTConnectScreen() {
-  const router = useRouter(); 
   const [brokerIP, setBrokerIP] = useState("");
   const [deviceName, setDeviceName] = useState("");
   const [subscribeTopic, setSubscribeTopic] = useState("");
@@ -36,9 +34,6 @@ export default function IoTConnectScreen() {
   return (
     <View style={styles.container}>
       <RNView style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <FontAwesome name="arrow-left" size={26} color={Colors.light.primary} />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>IoT Connect</Text>
       </RNView>
 
@@ -101,11 +96,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     width: "100%",
     marginBottom: 20,
-  },
-  backButton: {
-    marginRight: 12,
   },
   headerTitle: {
     fontSize: 20,
