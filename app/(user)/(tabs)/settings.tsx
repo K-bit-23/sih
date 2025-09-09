@@ -15,7 +15,7 @@ import { useColorScheme } from 'react-native';
 import { Link } from 'expo-router';
 
 export default function SettingsScreen() {
-  const { t, language, setLanguage } = useLanguage();
+  const { t, locale, setLanguage } = useLanguage();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme || 'light'];
 
@@ -69,24 +69,24 @@ export default function SettingsScreen() {
         <TouchableOpacity style={styles.menuItem} onPress={() => setLanguage('en')}>
           <MaterialIcons name="language" size={20} color={colors.text} />
           <Text style={[styles.menuItemText, { color: colors.text }]}>{t('english')}</Text>
-          {language === 'en' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
+          {locale === 'en' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={() => setLanguage('hi')}>
           <MaterialIcons name="language" size={20} color={colors.text} />
           <Text style={[styles.menuItemText, { color: colors.text }]}>{t('hindi')}</Text>
-          {language === 'hi' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
+          {locale === 'hi' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem} onPress={() => setLanguage('ta')}>
           <MaterialIcons name="language" size={20} color={colors.text} />
           <Text style={[styles.menuItemText, { color: colors.text }]}>{t('tamil')}</Text>
-          {language === 'ta' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
+          {locale === 'ta' && <FontAwesome5 name="check-circle" size={20} color={colors.primary} />}
         </TouchableOpacity>
       </View>
 
       {/* Device Section */}
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Text style={[styles.cardTitle, { color: colors.primary }]}>Device</Text>
-        <Link href="/(user)/(tabs)/iot-connect" asChild>
+        <Link href="/(user)/iot-connect" asChild>
           <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]}>
             <FontAwesome5 name="robot" size={20} color="#fff" />
             <Text style={styles.buttonText}>Connect Device</Text>
