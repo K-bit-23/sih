@@ -36,12 +36,7 @@ interface CardProps {
 }
 
 const InfoCard = ({ title, value, icon, color, trend }: CardProps) => (
-  <LinearGradient
-    colors={[color, color + 'CC']}
-    style={styles.card}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-  >
+  <View style={[styles.card, { backgroundColor: color }]}>
     <View style={styles.cardHeader}>
       <FontAwesome name={icon} size={24} color="white" />
       {trend && (
@@ -57,7 +52,7 @@ const InfoCard = ({ title, value, icon, color, trend }: CardProps) => (
     </View>
     <Text style={styles.cardTitle}>{title}</Text>
     <Text style={styles.cardValue}>{value}</Text>
-  </LinearGradient>
+  </View>
 );
 
 export default function DashboardScreen() {
@@ -307,11 +302,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   headerContent: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
   headerLeft: {
+    backgroundColor: 'transparent',
     flex: 1,
   },
   greeting: {
@@ -325,6 +322,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   locationContainer: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 4,
@@ -335,6 +333,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   profileButton: {
+    backgroundColor: 'transparent',
     padding: 8,
   },
   section: {
@@ -364,10 +363,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
-    elevation: 3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   quickActionText: {
     color: 'white',
@@ -381,10 +376,6 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 15,
     overflow: 'hidden',
-    elevation: 3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   video: {
     width: "100%",
@@ -420,12 +411,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 16,
     marginBottom: 12,
-    elevation: 4,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
   },
   cardHeader: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -450,10 +438,12 @@ const styles = StyleSheet.create({
     fontWeight: "600", 
     color: 'white',
     marginBottom: 4,
+    backgroundColor: 'transparent',
   },
   cardValue: { 
     fontSize: 18, 
     fontWeight: "bold", 
     color: 'white',
+    backgroundColor: 'transparent',
   },
 });
