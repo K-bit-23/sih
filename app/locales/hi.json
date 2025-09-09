@@ -1,0 +1,16 @@
+{
+  "settings": "समायोजन",
+  "account": "खाता",
+  "language": "भाषा",
+  "english": "अंग्रेज़ी",
+  "tamil": "तमिल",
+  "hindi": "हिंदी",
+  "darkMode": "डार्क मोड",
+  "enableBiometric": "बायोमेट्रिक सक्षम करें",
+  "customizeTabs": "निचले टैब को अनुकूलित करें",
+  "logout": "लॉग आउट",
+  "languageSelection": "भाषा चुनें",
+  "chooseLanguage": "अपनी पसंदीदा भाषा चुनें",
+  "cancel": "रद्द करना",
+  "logoutMessage": "आपने लॉग आउट कर दिया है।"
+}

@@ -1,0 +1,16 @@
+{
+  "settings": "Settings",
+  "account": "Account",
+  "language": "Language",
+  "english": "English",
+  "tamil": "Tamil",
+  "hindi": "Hindi",
+  "darkMode": "Dark Mode",
+  "enableBiometric": "Enable Biometric",
+  "customizeTabs": "Customize Bottom Tabs",
+  "logout": "Logout",
+  "languageSelection": "Select Language",
+  "chooseLanguage": "Choose your preferred language",
+  "cancel": "Cancel",
+  "logoutMessage": "You have been logged out."
+}

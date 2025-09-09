@@ -1,39 +1,58 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Switch, TouchableOpacity, Alert } from 'react-native';
 import { View, Text } from '../../../components/Themed';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function SettingsScreen() {
   const { colorScheme, setColorScheme } = useTheme();
+  const { t, setLanguage, locale } = useLanguage();
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+
+  const showLanguagePicker = () => {
+    Alert.alert(
+      t('languageSelection'),
+      t('chooseLanguage'),
+      [
+        { text: t('english'), onPress: () => setLanguage('en') },
+        { text: t('tamil'), onPress: () => setLanguage('ta') },
+        { text: t('hindi'), onPress: () => setLanguage('hi') },
+        { text: t('cancel'), style: 'cancel' },
+      ],
+      { cancelable: true }
+    );
+  };
+  
+  const getLanguageName = (locale) => {
+    if (locale.startsWith('en')) return t('english');
+    if (locale.startsWith('ta')) return t('tamil');
+    if (locale.startsWith('hi')) return t('hindi');
+    return t('english');
+  };
+
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Settings</Text>
+      <Text style={styles.header}>{t('settings')}</Text>
 
-      {/* Language Selection */}
-      <TouchableOpacity style={styles.row} onPress={() => Alert.alert('Language', 'Language selection coming soon!')}>
-        <Ionicons name="language" size={24} color="#27ae60" />
-        <Text style={styles.label}>Language</Text>
-        <Text style={styles.value}>English</Text>
+      {/* Account Section */}
+      <TouchableOpacity style={styles.row} onPress={() => Alert.alert(t('account'), t('account') + ' settings coming soon!')}>
+        <MaterialCommunityIcons name="account-circle-outline" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('account')}</Text>
       </TouchableOpacity>
 
-      {/* Location Toggle */}
-      <View style={styles.row}>
-        <Ionicons name="location" size={24} color="#27ae60" />
-        <Text style={styles.label}>Enable Location</Text>
-        <Switch
-          trackColor={{ false: '#767577', true: '#81b0ff' }}
-          thumbColor={true ? '#f5dd4b' : '#f4f3f4'}
-          onValueChange={() => Alert.alert('Location', 'Location services coming soon!')}
-          value={true} // Replace with state
-        />
-      </View>
+      {/* Language Selection */}
+      <TouchableOpacity style={styles.row} onPress={showLanguagePicker}>
+        <Ionicons name="language" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('language')}</Text>
+        <Text style={styles.value}>{getLanguageName(locale)}</Text>
+      </TouchableOpacity>
 
       {/* Dark Mode Toggle */}
       <View style={styles.row}>
         <FontAwesome name={colorScheme === 'dark' ? 'moon-o' : 'sun-o'} size={24} color="#27ae60" />
-        <Text style={styles.label}>Dark Mode</Text>
+        <Text style={styles.label}>{t('darkMode')}</Text>
         <Switch
           trackColor={{ false: '#767577', true: '#81b0ff' }}
           thumbColor={colorScheme === 'dark' ? '#f5dd4b' : '#f4f3f4'}
@@ -42,10 +61,28 @@ export default function SettingsScreen() {
         />
       </View>
 
+      {/* Enable Biometric Support */}
+      <View style={styles.row}>
+        <MaterialCommunityIcons name="fingerprint" size={24} color="#27ae60" />
+        <Text style={styles.label}>{t('enableBiometric')}</Text>
+        <Switch
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={isBiometricEnabled ? '#f5dd4b' : '#f4f3f4'}
+          onValueChange={() => setIsBiometricEnabled(previousState => !previousState)}
+          value={isBiometricEnabled}
+        />
+      </View>
+
       {/* Tab Bar Customization */}
-      <TouchableOpacity style={styles.row} onPress={() => Alert.alert('Customize Tabs', 'Tab customization coming soon!')}>
+      <TouchableOpacity style={styles.row} onPress={() => Alert.alert(t('customizeTabs'), t('customizeTabs') + ' coming soon!')}>
         <Ionicons name="options" size={24} color="#27ae60" />
-        <Text style={styles.label}>Customize Bottom Tabs</Text>
+        <Text style={styles.label}>{t('customizeTabs')}</Text>
+      </TouchableOpacity>
+      
+      {/* Logout Button */}
+      <TouchableOpacity style={styles.row} onPress={() => Alert.alert(t('logout'), t('logoutMessage'))}>
+        <MaterialCommunityIcons name="logout" size={24} color="#c0392b" />
+        <Text style={[styles.label, { color: '#c0392b' }]}>{t('logout')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -66,7 +103,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ecf0f1',
@@ -75,6 +111,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 15,
     color: '#333',
+    flex: 1,
   },
   value: {
     fontSize: 18,
