@@ -24,7 +24,7 @@ export default function SettingsScreen() {
     );
   };
   
-  const getLanguageName = (locale) => {
+  const getLanguageName = (locale: string) => {
     if (locale.startsWith('en')) return t('english');
     if (locale.startsWith('ta')) return t('tamil');
     if (locale.startsWith('hi')) return t('hindi');

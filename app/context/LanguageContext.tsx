@@ -1,26 +1,32 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 import * as Localization from 'expo-localization';
-import i18n from 'i18n-js';
+import { I18n } from 'i18n-js';
 
 import en from '../locales/en.json';
 import ta from '../locales/ta.json';
 import hi from '../locales/hi.json';
 
-i18n.translations = { en, ta, hi };
+interface LanguageContextType {
+  locale: string;
+  setLanguage: (lang: string) => void;
+  t: (key: string) => string;
+}
+
+const i18n = new I18n({ en, ta, hi });
 i18n.locale = Localization.locale;
-i18n.fallbacks = true;
+i18n.enableFallback = true;
 
-export const LanguageContext = createContext();
+export const LanguageContext = createContext<LanguageContextType>({} as LanguageContextType);
 
-export const LanguageProvider = ({ children }) => {
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [locale, setLocale] = useState(Localization.locale);
 
-  const setLanguage = (lang) => {
+  const setLanguage = (lang: string) => {
     i18n.locale = lang;
     setLocale(lang);
   };
 
-  const t = (key) => i18n.t(key);
+  const t = (key: string) => i18n.t(key);
 
   return (
     <LanguageContext.Provider value={{ locale, setLanguage, t }}>
