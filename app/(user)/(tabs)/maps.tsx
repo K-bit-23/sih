@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import { FontAwesome5 } from "@expo/vector-icons";
 import Colors from '@/constants/Colors';
 
@@ -68,7 +68,6 @@ export default function MapsScreen() {
   return (
     <View style={styles.container}>
       <MapView
-        provider={PROVIDER_GOOGLE} // Use Google Maps
         style={styles.map}
         initialRegion={initialRegion}
         showsUserLocation
