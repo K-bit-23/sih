@@ -1,8 +1,21 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ListRenderItem } from 'react-native';
 
-const WasteLogList = ({ data }) => {
-  const renderItem = ({ item }) => (
+// Define the type for a single waste log item
+interface WasteLog {
+  id: string;
+  type: string;
+  weight: string;
+  date: string;
+}
+
+// Define the props for the WasteLogList component
+interface WasteLogListProps {
+  data: WasteLog[];
+}
+
+const WasteLogList: React.FC<WasteLogListProps> = ({ data }) => {
+  const renderItem: ListRenderItem<WasteLog> = ({ item }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.itemText}>{item.type}</Text>
       <Text style={styles.itemText}>{item.weight}</Text>
