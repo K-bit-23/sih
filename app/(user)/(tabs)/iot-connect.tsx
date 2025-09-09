@@ -7,12 +7,13 @@ import {
   View as RNView,
   TouchableOpacity,
   Modal,
+  Button,
 } from "react-native";
 import { View } from "../../../components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
-import { Camera } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function IoTConnectScreen() {
   const [brokerIP, setBrokerIP] = useState("");
@@ -21,20 +22,13 @@ export default function IoTConnectScreen() {
   const [publishTopic, setPublishTopic] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [isScannerVisible, setScannerVisible] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
   }, []);
 
   const handleConnect = () => {
@@ -45,7 +39,7 @@ export default function IoTConnectScreen() {
     Alert.alert("✅ Connected", "IoT Device Connected Successfully!");
   };
 
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
+  const handleBarCodeScanned = ({ data }: { data: string }) => {
     setScanned(true);
     setScannerVisible(false);
     try {
@@ -64,11 +58,19 @@ export default function IoTConnectScreen() {
     }
   };
 
-  if (hasPermission === null) {
-    return <View style={styles.container}><Text>Requesting for camera permission</Text></View>;
+  if (!permission) {
+    // Camera permissions are still loading
+    return <View />;
   }
-  if (hasPermission === false) {
-    return <View style={styles.container}><Text>No access to camera</Text></View>;
+
+  if (!permission.granted) {
+    // Camera permissions are not granted yet
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: 'center', marginBottom: 20 }}>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="Grant Permission" />
+      </View>
+    );
   }
 
   return (
@@ -139,8 +141,8 @@ export default function IoTConnectScreen() {
         onRequestClose={() => setScannerVisible(false)}
       >
         <View style={styles.scannerContainer}>
-          <Camera
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          <CameraView
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
             style={StyleSheet.absoluteFillObject}
           />
           <TouchableOpacity style={styles.closeButton} onPress={() => setScannerVisible(false)}>
@@ -157,6 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f6fff9",
     alignItems: "center",
+    justifyContent: 'center',
   },
   header: {
     width: "100%",
@@ -168,6 +171,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     elevation: 6,
     marginBottom: 20,
+    position: 'absolute',
+    top: 0,
   },
   headerTitle: {
     fontSize: 28,
@@ -191,6 +196,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 5,
+    marginTop: 150, // Adjust this to leave space for the header
   },
   title: {
     fontSize: 22,
