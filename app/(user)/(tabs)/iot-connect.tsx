@@ -10,9 +10,10 @@ import {
 import { View } from "../../../components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import Colors from "../../../constants/Colors";
 
 export default function IoTConnectScreen() {
-  const router = useRouter(); // for back navigation
+  const router = useRouter(); 
   const [brokerIP, setBrokerIP] = useState("");
   const [deviceName, setDeviceName] = useState("");
   const [subscribeTopic, setSubscribeTopic] = useState("");
@@ -34,30 +35,25 @@ export default function IoTConnectScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header with Back Button */}
       <RNView style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <FontAwesome name="arrow-left" size={26} color="#145a32" />
+          <FontAwesome name="arrow-left" size={26} color={Colors.light.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>IoT Connect</Text>
       </RNView>
 
-      {/* WiFi Icon */}
-      <FontAwesome name="wifi" size={50} color="#27ae60" style={{ marginBottom: 12 }} />
+      <FontAwesome name="wifi" size={50} color={Colors.light.primary} style={{ marginBottom: 12 }} />
 
-      {/* Current Time */}
       <Text style={styles.time}>{currentTime.toLocaleTimeString()}</Text>
 
-      {/* Title and Subtitle */}
       <Text style={styles.title}>IoT Device Details</Text>
       <Text style={styles.subtitle}>Enter your device details below.</Text>
 
-      {/* Form */}
       <RNView style={styles.formContainer}>
         <TextInput
           style={styles.input}
           placeholder="Broker IP"
-          placeholderTextColor="#145a32"
+          placeholderTextColor={Colors.light.tabIconDefault}
           value={brokerIP}
           onChangeText={setBrokerIP}
           textAlign="center"
@@ -65,7 +61,7 @@ export default function IoTConnectScreen() {
         <TextInput
           style={styles.input}
           placeholder="Device Name"
-          placeholderTextColor="#145a32"
+          placeholderTextColor={Colors.light.tabIconDefault}
           value={deviceName}
           onChangeText={setDeviceName}
           textAlign="center"
@@ -73,7 +69,7 @@ export default function IoTConnectScreen() {
         <TextInput
           style={styles.input}
           placeholder="Subscribe Topic"
-          placeholderTextColor="#145a32"
+          placeholderTextColor={Colors.light.tabIconDefault}
           value={subscribeTopic}
           onChangeText={setSubscribeTopic}
           textAlign="center"
@@ -81,7 +77,7 @@ export default function IoTConnectScreen() {
         <TextInput
           style={styles.input}
           placeholder="Publish Topic"
-          placeholderTextColor="#145a32"
+          placeholderTextColor={Colors.light.tabIconDefault}
           value={publishTopic}
           onChangeText={setPublishTopic}
           textAlign="center"
@@ -98,7 +94,7 @@ export default function IoTConnectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#d9f2d9", // light green
+    backgroundColor: Colors.light.background,
     alignItems: "center",
     padding: 24,
   },
@@ -114,25 +110,25 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#145a32",
+    color: Colors.light.text,
   },
   time: {
-    fontSize: 14, // smaller
-    fontWeight: "400", // less bold
-    color: "#145a32",
+    fontSize: 14, 
+    fontWeight: "400", 
+    color: Colors.light.text,
     marginBottom: 16,
     textAlign: "center",
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#27ae60",
+    color: Colors.light.primary,
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "#145a32",
+    color: Colors.light.text,
     textAlign: "center",
     marginBottom: 20,
   },
@@ -142,16 +138,17 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "90%",
-    backgroundColor: "#ffffff",
+    backgroundColor: Colors.light.card,
     padding: 12,
     marginBottom: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#27ae60",
+    borderColor: Colors.light.cardBorder,
+    color: Colors.light.text,
   },
   button: {
     width: "90%",
-    backgroundColor: "#2ecc71",
+    backgroundColor: Colors.light.primary,
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
