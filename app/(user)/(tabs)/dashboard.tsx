@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
+  Image,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import WasteLogList from "@/components/WasteLogList";
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Video, ResizeMode } from "expo-av";
 import Colors from "@/constants/Colors";
@@ -33,6 +34,13 @@ interface CardProps {
   icon: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
   trend?: string;
+}
+
+interface UserProfile {
+  name: string;
+  email: string;
+  phone: string;
+  avatar: string | null;
 }
 
 const InfoCard = ({ title, value, icon, color, trend }: CardProps) => (
@@ -60,6 +68,7 @@ export default function DashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<string>('');
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const [temperature] = useState("28°C");
   const [humidity] = useState("65%");
@@ -69,6 +78,7 @@ export default function DashboardScreen() {
   useEffect(() => {
     checkLocationStatus();
     loadDashboardData();
+    loadUserProfile();
   }, []);
 
   const checkLocationStatus = async () => {
@@ -104,6 +114,17 @@ export default function DashboardScreen() {
     }
   };
 
+  const loadUserProfile = async () => {
+    try {
+      const profile = await AsyncStorage.getItem('userProfile');
+      if (profile) {
+        setUserProfile(JSON.parse(profile));
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  };
+
   const loadDashboardData = async () => {
     // Simulate loading data
     setRefreshing(true);
@@ -117,6 +138,7 @@ export default function DashboardScreen() {
     if (locationEnabled) {
       getCurrentLocation();
     }
+    loadUserProfile();
   };
 
   const cards: CardProps[] = [
@@ -124,42 +146,42 @@ export default function DashboardScreen() {
       title: "Temperature",
       value: temperature,
       icon: "thermometer-three-quarters",
-      color: Colors.light.primary, // Blue for general info
+      color: Colors.light.primary,
       trend: "+2°C"
     },
     {
       title: "Humidity",
       value: humidity,
       icon: "tint",
-      color: Colors.light.primary, // Blue for general info
+      color: Colors.light.primary,
       trend: "-5%"
     },
     {
       title: "Air Quality",
       value: airQuality,
       icon: "leaf",
-      color: Colors.light.accent, // Green for positive metric
+      color: Colors.light.accent,
       trend: "Good"
     },
     {
       title: "Recyclable",
       value: "1.8 kg",
       icon: "recycle",
-      color: Colors.light.accent, // Green for positive metric
+      color: Colors.light.accent,
       trend: "+0.3kg"
     },
     {
       title: "Non-Recyclable",
       value: "0.5 kg",
       icon: "trash",
-      color: Colors.light.secondary, // Orange for neutral/warning
+      color: Colors.light.secondary,
       trend: "-0.2kg"
     },
     {
       title: "Hazardous",
       value: "0.3 kg",
       icon: "warning",
-      color: Colors.light.danger, // Red for negative metric
+      color: Colors.light.danger,
       trend: "0kg"
     },
   ];
@@ -210,7 +232,7 @@ export default function DashboardScreen() {
         <View style={styles.headerContent}>
           <View style={styles.headerLeft}>
             <Text style={styles.greeting}>Good Morning! 🌱</Text>
-            <Text style={[styles.title, { color: Colors.light.accent }]}>Eco Dashboard</Text>
+            <Text style={[styles.title, { color: '#FFFFFF' }]}>Eco Dashboard</Text>
             {locationEnabled && currentLocation && (
               <View style={styles.locationContainer}>
                 <Ionicons name="location" size={14} color="rgba(255,255,255,0.8)" />
@@ -222,7 +244,13 @@ export default function DashboardScreen() {
             style={styles.profileButton}
             onPress={() => router.push('/(user)/(tabs)/settings')}
           >
-            <FontAwesome name="user-circle-o" size={32} color="white" />
+            {userProfile?.avatar ? (
+              <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
+            ) : (
+              <View style={[styles.avatarPlaceholder]}>
+                <FontAwesome5 name="user" size={20} color={Colors.light.primary} />
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -333,8 +361,20 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   profileButton: {
-    backgroundColor: 'transparent',
-    padding: 8,
+    padding: 0,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  avatarPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   section: {
     paddingHorizontal: 16,
@@ -422,7 +462,7 @@ const styles = StyleSheet.create({
   trendContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.15)', // Changed from white to black transparent
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
