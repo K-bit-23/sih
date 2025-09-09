@@ -13,6 +13,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Colors from '../../../constants/Colors';
+import { Link } from 'expo-router';
 
 export default function SettingsScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -104,6 +105,16 @@ export default function SettingsScreen() {
             <FontAwesome5 name="sign-out-alt" size={20} color="#fff" />
             <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Device</Text>
+        <Link href="/(user)/(tabs)/iot-connect" asChild>
+            <TouchableOpacity style={styles.button}>
+                <FontAwesome5 name="robot" size={20} color="#fff" />
+                <Text style={styles.buttonText}>Device Connection</Text>
+            </TouchableOpacity>
+        </Link>
       </View>
 
       <View style={styles.card}>
