@@ -55,6 +55,16 @@ export default function MapsScreen() {
     }
   };
 
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.webText}>
+          🌍 Native maps are not available on the web. Please use the mobile app to view the map.
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <MapView
@@ -103,7 +113,9 @@ export default function MapsScreen() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: Colors.light.background 
+    backgroundColor: Colors.light.background,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   map: { 
     ...StyleSheet.absoluteFillObject,
@@ -161,5 +173,11 @@ const styles = StyleSheet.create({
     color: Colors.light.secondary,
     fontStyle: "italic",
     textAlign: "center",
+  },
+  webText: {
+    padding: 20,
+    fontSize: 16,
+    textAlign: 'center',
+    color: Colors.light.text,
   },
 });
