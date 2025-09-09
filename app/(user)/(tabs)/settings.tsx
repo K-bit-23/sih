@@ -19,7 +19,7 @@ import {
 } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
-import { useRouter } from "expo-router";
+import { useRouter, Link } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as LocalAuthentication from "expo-local-authentication";
 
@@ -223,6 +223,14 @@ export default function SettingsScreen() {
         <Ionicons name="options" size={24} color="#27ae60" />
         <Text style={styles.label}>{t("customizeTabs")}</Text>
       </TouchableOpacity>
+
+      {/* Device Connection */}
+      <Link href="/(user)/(tabs)/iot-connect" asChild>
+        <TouchableOpacity style={styles.row}>
+          <MaterialCommunityIcons name="robot" size={24} color="#27ae60" />
+          <Text style={styles.label}>Device Connection</Text>
+        </TouchableOpacity>
+      </Link>
 
       {/* Reset */}
       <TouchableOpacity
