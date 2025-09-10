@@ -256,14 +256,14 @@ export default function DashboardScreen() {
         <View style={styles.headerActions}>
             <TouchableOpacity
                 style={styles.headerActionItem}
-                onPress={() => router.push('/(user)/iot-connect')}
+                onPress={() => router.push('/(user)/iot-connect' as any)}
             >
                 <FontAwesome5 name="wifi" size={22} color="white" />
                 <Text style={styles.headerActionText}>IoT</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={styles.headerActionItem}
-                onPress={() => router.push('/(user)/rewards')}
+                onPress={() => router.push('/(user)/rewards' as any)}
             >
                 <FontAwesome5 name="trophy" size={22} color="white" />
                 <Text style={styles.headerActionText}>Rewards</Text>
