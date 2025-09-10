@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   StatusBar,
@@ -7,6 +7,8 @@ import {
   ScrollView,
   RefreshControl,
   Image,
+  Animated,
+  Easing,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import WasteLogList from "@/components/WasteLogList";
@@ -73,6 +75,24 @@ export default function DashboardScreen() {
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [greeting, setGreeting] = useState("");
+
+  const orbitAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(orbitAnim, {
+        toValue: 1,
+        duration: 10000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
+
+  const rotation = orbitAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   const [temperature] = useState("28°C");
   const [humidity] = useState("65%");
@@ -178,16 +198,18 @@ export default function DashboardScreen() {
             <Text style={styles.username}>{userProfile?.name || "User"}</Text>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.headerIcon}>
-              <FontAwesome5 name="bluetooth-b" size={18} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.headerIcon} onPress={() => router.push("/(user)/iot-connect" as any)}>
-              <FontAwesome5 name="wifi" size={18} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.headerIcon} onPress={() => router.push("/(user)/rewards" as any)}>
-              <FontAwesome5 name="trophy" size={18} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/(user)/(tabs)/settings" as any)}>
+            <Animated.View style={[styles.orbitContainer, { transform: [{ rotate: rotation }] }]}>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon1]} onPress={() => router.push("/(user)/iot-connect" as any)}>
+                <FontAwesome5 name="wifi" size={16} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon2]}>
+                <FontAwesome5 name="bluetooth-b" size={16} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon3]} onPress={() => router.push("/(user)/rewards" as any)}>
+                <FontAwesome5 name="trophy" size={16} color="white" />
+              </TouchableOpacity>
+            </Animated.View>
+            <TouchableOpacity onPress={() => router.push("/(user)/(tabs)/settings" as any)} style={styles.avatarButton}>
               {userProfile?.avatar ? (
                 <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
               ) : (
@@ -284,10 +306,10 @@ const styles = StyleSheet.create({
   headerTop: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     backgroundColor: "transparent",
   },
-  headerLeft: { backgroundColor: "transparent" },
+  headerLeft: { backgroundColor: "transparent", flex: 1 },
   greeting: { fontSize: 16, color: "rgba(255,255,255,0.9)" },
   username: { fontSize: 24, fontWeight: "bold", color: "white" },
   locationContainer: {
@@ -298,44 +320,56 @@ const styles = StyleSheet.create({
   },
   location: { fontSize: 14, color: "rgba(255,255,255,0.8)", marginLeft: 5 },
   headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  headerIcon: {
+    width: 100,
+    height: 100,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
   },
-  avatar: { width: 42, height: 42, borderRadius: 21 },
+  avatarButton: {
+    zIndex: 1,
+  },
+  avatar: { width: 44, height: 44, borderRadius: 22 },
   avatarPlaceholder: {
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
   },
-  section: { marginTop: 25, },
+  orbitContainer: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  orbitIcon: {
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  orbitIcon1: { transform: [{ translateY: -45 }] },
+  orbitIcon2: { transform: [{ translateX: -45 }] },
+  orbitIcon3: { transform: [{ translateX: 45 }] },
+  section: { marginTop: 25 },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingLeft: 20,
-    paddingRight: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginBottom: 15,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: Colors.light.text,
-    marginBottom: 15,
-    paddingLeft: 20,
   },
   viewAll: {
     fontSize: 14,
     color: Colors.light.primary,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   quickActionsContainer: {
     paddingHorizontal: 20,
@@ -398,7 +432,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: "hidden",
     backgroundColor: Colors.light.card,
-    marginLeft: 20,
+    alignSelf: "center",
   },
   video: { width: "100%", height: "100%" },
   videoError: {
