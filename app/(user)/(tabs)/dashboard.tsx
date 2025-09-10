@@ -203,13 +203,13 @@ export default function DashboardScreen() {
       title: "IoT Connect", 
       icon: "wifi", 
       color: Colors.light.secondary,
-      route: "/(user)/(tabs)/iot-connect"
+      route: "/(user)/iot-connect"
     },
     { 
       title: "Rewards", 
       icon: "trophy", 
       color: "#FFD93D",
-      route: "/(user)/(tabs)/rewards"
+      route: "/(user)/rewards"
     },
   ];
 
