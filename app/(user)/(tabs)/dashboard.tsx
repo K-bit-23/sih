@@ -200,16 +200,16 @@ export default function DashboardScreen() {
       route: "/(user)/(tabs)/maps"
     },
     { 
-      title: "IoT Connect", 
-      icon: "wifi", 
-      color: Colors.light.secondary,
-      route: "/(user)/iot-connect"
+      title: "Community", 
+      icon: "group", 
+      color: "#3498db",
+      route: "/(user)/community"
     },
     { 
-      title: "Rewards", 
-      icon: "trophy", 
-      color: "#FFD93D",
-      route: "/(user)/rewards"
+      title: "Education", 
+      icon: "book", 
+      color: "#9b59b6",
+      route: "/(user)/education"
     },
   ];
 
@@ -252,6 +252,22 @@ export default function DashboardScreen() {
               </View>
             )}
           </TouchableOpacity>
+        </View>
+        <View style={styles.headerActions}>
+            <TouchableOpacity
+                style={styles.headerActionItem}
+                onPress={() => router.push('/(user)/iot-connect')}
+            >
+                <FontAwesome5 name="wifi" size={22} color="white" />
+                <Text style={styles.headerActionText}>IoT</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.headerActionItem}
+                onPress={() => router.push('/(user)/rewards')}
+            >
+                <FontAwesome5 name="trophy" size={22} color="white" />
+                <Text style={styles.headerActionText}>Rewards</Text>
+            </TouchableOpacity>
         </View>
       </LinearGradient>
 
@@ -328,8 +344,10 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 30,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   headerContent: {
     backgroundColor: 'transparent',
@@ -378,6 +396,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    marginTop: 15,
+  },
+  headerActionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  headerActionText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
   section: {
     paddingHorizontal: 16,
     marginBottom: 20,
@@ -390,7 +430,7 @@ const styles = StyleSheet.create({
   },
   quickActionsContainer: {
     paddingHorizontal: 16,
-    marginTop: -10, // Overlap with header
+    marginTop: -30,
     marginBottom: 20,
     backgroundColor: 'white',
     borderRadius: 20,
@@ -480,7 +520,7 @@ const styles = StyleSheet.create({
   trendContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.15)', // Changed from white to black transparent
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,
