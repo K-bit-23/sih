@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "react-native";
 import Colors from "../../../constants/Colors";
 import { useLanguage } from "../../context/LanguageContext";
@@ -49,30 +49,12 @@ const TabLayout = () => {
           ),
         }}
       />
-       <Tabs.Screen
-        name="rewards"
-        options={{
-          title: t("rewards"),
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="trophy" size={24} color={color} />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="settings"
         options={{
           title: t("settings"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings" size={24} color={color} />
-          ),
-        }}
-      />
-       <Tabs.Screen
-        name="iot-connect"
-        options={{
-          title: t("iot"),
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="cloud-queue" size={24} color={color} />
           ),
         }}
       />
