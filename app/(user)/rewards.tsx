@@ -11,6 +11,8 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { db } from '../firebase';
+import { collection, getDocs, addDoc, query, where, orderBy } from 'firebase/firestore';
 
 const rewards = [
   {
@@ -65,6 +67,68 @@ const rewards = [
 
 export default function RewardsScreen() {
   const router = useRouter();
+  const [userPoints, setUserPoints] = useState(8450);
+  const [redeemedRewards, setRedeemedRewards] = useState<string[]>([]);
+
+  useEffect(() => {
+    loadUserRewards();
+  }, []);
+
+  const loadUserRewards = async () => {
+    try {
+      // In a real app, you would get the current user's ID from authentication
+      const rewardsRef = collection(db, 'user_rewards');
+      const q = query(rewardsRef, where('userId', '==', 'current_user_id'));
+      const snapshot = await getDocs(q);
+      
+      const redeemed: string[] = [];
+      snapshot.forEach((doc) => {
+        redeemed.push(doc.data().rewardId);
+      });
+      setRedeemedRewards(redeemed);
+    } catch (error) {
+      console.error('Error loading rewards:', error);
+    }
+  };
+
+  const handleRedeemReward = async (reward: typeof rewards[0]) => {
+    if (userPoints < reward.points) {
+      Alert.alert('Insufficient Points', `You need ${reward.points - userPoints} more points to redeem this reward.`);
+      return;
+    }
+
+    Alert.alert(
+      'Redeem Reward',
+      `Are you sure you want to redeem "${reward.title}" for ${reward.points} points?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Redeem',
+          onPress: async () => {
+            try {
+              // Add to Firebase
+              await addDoc(collection(db, 'user_rewards'), {
+                userId: 'current_user_id', // In real app, get from auth
+                rewardId: reward.id,
+                rewardTitle: reward.title,
+                pointsSpent: reward.points,
+                redeemedAt: new Date(),
+              });
+
+              // Update local state
+              setUserPoints(prev => prev - reward.points);
+              setRedeemedRewards(prev => [...prev, reward.id]);
+
+              Alert.alert('Success!', `You have successfully redeemed "${reward.title}". Check your email for details.`);
+            } catch (error) {
+              console.error('Error redeeming reward:', error);
+              Alert.alert('Error', 'Failed to redeem reward. Please try again.');
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -81,12 +145,20 @@ export default function RewardsScreen() {
         <Text style={styles.headerTitle}>Redeem Rewards</Text>
         <View style={styles.pointsContainer}>
           <FontAwesome5 name="star" solid size={20} color="#FFD700" />
-          <Text style={styles.pointsText}>Your Points: 8,450</Text>
+          <Text style={styles.pointsText}>Your Points: {userPoints.toLocaleString()}</Text>
         </View>
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.gridContainer}>
         {rewards.map((reward) => (
-          <TouchableOpacity key={reward.id} style={styles.rewardCard}>
+          <TouchableOpacity 
+            key={reward.id} 
+            style={[
+              styles.rewardCard,
+              redeemedRewards.includes(reward.id) && styles.redeemedCard
+            ]}
+            onPress={() => handleRedeemReward(reward)}
+            disabled={redeemedRewards.includes(reward.id)}
+          >
             <ImageBackground
               source={{ uri: reward.image }}
               style={styles.imageBackground}
@@ -108,6 +180,12 @@ export default function RewardsScreen() {
                 <View style={styles.pointsBadge}>
                   <Text style={styles.rewardPoints}>{`${reward.points} pts`}</Text>
                 </View>
+                {redeemedRewards.includes(reward.id) && (
+                  <View style={styles.redeemedBadge}>
+                    <FontAwesome5 name="check" size={16} color="white" />
+                    <Text style={styles.redeemedText}>Redeemed</Text>
+                  </View>
+                )}
               </LinearGradient>
             </ImageBackground>
           </TouchableOpacity>
@@ -209,5 +287,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     color: "black",
+  },
+  redeemedCard: {
+    opacity: 0.6,
+  },
+  redeemedBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(76, 175, 80, 0.9)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  redeemedText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginLeft: 4,
   },
 });
