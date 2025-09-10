@@ -43,7 +43,7 @@ export function View(props: ViewProps) {
 
   const webStyle = Platform.OS === 'web' && {
 	  width: '100%',
-	  height: '100vh'
+	  height: '100%'
   }
 
   return <DefaultView style={[{ backgroundColor }, style, webStyle]} {...otherProps} />;
