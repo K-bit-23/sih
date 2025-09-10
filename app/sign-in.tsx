@@ -48,7 +48,7 @@ export default function SignInScreen() {
 
       if (success) {
         showAlert("Biometric Login Successful", "Welcome back!");
-        router.replace("/(user)/(tabs)/dashboard" as any);
+        router.replace("/(user)/(tabs)/dashboard");
       } else {
         showAlert("Biometric Login Failed", "Please try again.");
       }
@@ -66,13 +66,13 @@ export default function SignInScreen() {
     if (role === "admin") {
       if (email === "admin" && password === "admin") {
         showAlert("👨‍💻 Admin Login", "Welcome back, Admin!");
-        router.replace("/(admin)" as any);
+        router.replace("/(admin)");
       } else {
         showAlert("Login Failed", "Invalid admin credentials.");
       }
     } else {
       showAlert("🙋‍♂️ User Login", "Welcome back, User!");
-      router.replace("/(user)/(tabs)/dashboard" as any);
+      router.replace("/(user)/(tabs)/dashboard");
     }
   };
 
