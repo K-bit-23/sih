@@ -208,7 +208,11 @@ export default function DashboardScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickActionsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.quickActionsContainer}
+        >
           {quickActions.map((action, index) => (
             <TouchableOpacity
               key={index}
