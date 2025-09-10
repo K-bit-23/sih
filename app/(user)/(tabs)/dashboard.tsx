@@ -258,14 +258,16 @@ export default function DashboardScreen() {
       {/* Quick Actions */}
       <View style={styles.quickActionsContainer}>
         <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.quickActions}>
+        <View style={styles.quickActionsGrid}>
           {quickActions.map((action, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.quickActionCard, { backgroundColor: action.color }]}
+              style={styles.quickActionIcon}
               onPress={() => router.push(action.route as any)}
             >
-              <FontAwesome name={action.icon as any} size={24} color="white" />
+              <View style={[styles.quickActionCircle, { backgroundColor: action.color }]}>
+                <FontAwesome name={action.icon as any} size={24} color="white" />
+              </View>
               <Text style={styles.quickActionText}>{action.title}</Text>
             </TouchableOpacity>
           ))}
@@ -388,27 +390,43 @@ const styles = StyleSheet.create({
   },
   quickActionsContainer: {
     paddingHorizontal: 16,
-    marginTop: 20,
+    marginTop: -10, // Overlap with header
     marginBottom: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 15,
+    marginHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  quickActions: {
+  quickActionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
   },
-  quickActionCard: {
-    width: (width - 48) / 2,
-    aspectRatio: 1.5,
-    borderRadius: 15,
+  quickActionIcon: {
+    alignItems: 'center',
+    width: '25%',
+    marginBottom: 15,
+  },
+  quickActionCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   quickActionText: {
-    color: 'white',
-    fontSize: 14,
+    color: Colors.light.text,
+    fontSize: 12,
     fontWeight: '600',
-    marginTop: 8,
     textAlign: 'center',
   },
   videoBox: {
