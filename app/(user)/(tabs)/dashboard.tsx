@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     width: width - 40,
     height: 180,
     borderRadius: 15,
-    overflow: "hidden",_RESPONSE
+    overflow: "hidden",
     backgroundColor: Colors.light.card,
     alignSelf: "center",
   },
