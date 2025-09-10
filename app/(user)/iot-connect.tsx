@@ -7,10 +7,10 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { View } from '../../../components/Themed';
+import { View } from '@/components/Themed';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import Colors from '../../../constants/Colors';
-import { useLanguage } from '../../context/LanguageContext';
+import Colors from '@/constants/Colors';
+import { useLanguage } from '@/context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function IoTConnectScreen() {
