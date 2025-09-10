@@ -1,250 +1,213 @@
-import { useState } from "react";
+
+import React from "react";
 import {
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Image,
   ScrollView,
-  Alert,
-  View as RNView,
-  FlatList,
+  TouchableOpacity,
+  ImageBackground,
 } from "react-native";
-import { View, Text } from "../../components/Themed";
-import * as ImagePicker from "expo-image-picker";
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import Colors from "../../constants/Colors";
+import { View, Text } from "@/components/Themed";
+import { FontAwesome5 } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 
-const leaderboardData = [
-  { id: "1", rank: 1, user: "GreenWarrior", points: 2500 },
-  { id: "2", rank: 2, user: "EcoSavvy", points: 2350 },
-  { id: "3", rank: 3, user: "RecycleKing", points: 2100 },
-  { id: "4", rank: 4, user: "WasteWatcher", points: 1980 },
-  { id: "5", rank: 5, user: "PlanetProtector", points: 1820 },
-  { id: "6", rank: 6, user: "SortMaster", points: 1700 },
-  { id: "7", rank: 7, user: "EcoChamp", points: 1550 },
-  { id: "8", rank: 8, user: "TerraGuard", points: 1400 },
-  { id: "9", rank: 9, user: "EnviroHero", points: 1250 },
-  { id: "10", rank: 10, user: "NatureLover", points: 1100 },
+const rewards = [
+  {
+    id: "1",
+    title: "Eco-Friendly Water Bottle",
+    points: 1500,
+    icon: "bottle-water",
+    color: ["#4c669f", "#3b5998", "#192f6a"],
+    image: "https://images.unsplash.com/photo-1613279165034-4b5a4a5f4f8b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: "2",
+    title: "Reusable Shopping Bag",
+    points: 1200,
+    icon: "shopping-bag",
+    color: ["#f7b733", "#fc4a1a"],
+    image: "https://images.unsplash.com/photo-1594270433934-75489a2631a0?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: "3",
+    title: "Solar-Powered Charger",
+    points: 3500,
+    icon: "solar-panel",
+    color: ["#42e695", "#3bb2b8"],
+    image: "https://images.unsplash.com/photo-1516056589531-c454784e12c1?q=80&w=1962&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: "4",
+    title: "Plant a Tree Donation",
+    points: 1000,
+    icon: "tree",
+    color: ["#6a11cb", "#2575fc"],
+    image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: "5",
+    title: "Bamboo Toothbrush Set",
+    points: 800,
+    icon: "tooth",
+    color: ["#00c6ff", "#0072ff"],
+    image: "https://images.unsplash.com/photo-1590846406792-04426b3a0dbb?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: "6",
+    title: "Smart Composter Discount",
+    points: 5000,
+    icon: "recycle",
+    color: ["#d4fc79", "#96e6a1"],
+    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1913&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
 ];
 
 export default function RewardsScreen() {
-  const [upiId, setUpiId] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [image, setImage] = useState<string | null>(null);
-
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
-    if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  const takePhoto = async () => {
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
-    if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  const handleSubmit = () => {
-    if (!upiId && !mobileNumber) {
-      Alert.alert("Missing Information", "Please enter a UPI ID or Mobile Number.");
-      return;
-    }
-    if (!image) {
-      Alert.alert("Missing Screenshot", "Please upload or take a screenshot of the QR code.");
-      return;
-    }
-    Alert.alert(
-      "Submission Successful!",
-      `Your request has been submitted with the following details:\nUPI/Mobile: ${upiId || mobileNumber}\nImage attached ✅`
-    );
-  };
-
-  const renderLeaderboardItem = ({ item }: { item: typeof leaderboardData[0] }) => (
-    <RNView style={styles.leaderboardRow}>
-      <Text style={[styles.leaderboardText, styles.rank]}>{item.rank}</Text>
-      <Text style={[styles.leaderboardText, styles.user]}>{item.user}</Text>
-      <Text style={[styles.leaderboardText, styles.points]}>{item.points}</Text>
-    </RNView>
-  );
+  const router = useRouter();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🏆 Leaderboard</Text>
-      <View style={styles.leaderboardContainer}>
-        <View style={styles.leaderboardHeader}>
-          <Text style={[styles.headerText, styles.rank]}>Rank</Text>
-          <Text style={[styles.headerText, styles.user]}>User</Text>
-          <Text style={[styles.headerText, styles.points]}>Points</Text>
-        </View>
-        <FlatList
-          data={leaderboardData.slice(0, 10)}
-          renderItem={renderLeaderboardItem}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-
-      <Text style={styles.title}>🎁 Claim Your Rewards</Text>
-      <Text style={styles.subText}>
-        Redeem your points by submitting your payment details below.
-      </Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Enter UPI ID or Mobile Number"
-        placeholderTextColor="#888"
-        value={upiId || mobileNumber}
-        onChangeText={(text) => {
-          if (isNaN(Number(text))) {
-            setUpiId(text);
-            setMobileNumber("");
-          } else {
-            setMobileNumber(text);
-            setUpiId("");
-          }
-        }}
-      />
-
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
-          <FontAwesome name="image" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Upload Screenshot</Text>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[Colors.light.primary, Colors.light.accent]}
+        style={styles.header}
+      >
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <FontAwesome5 name="arrow-left" size={20} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
-          <FontAwesome name="camera" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Take Photo</Text>
-        </TouchableOpacity>
-      </View>
-
-      {image && (
-        <View style={styles.previewBox}>
-          <Image source={{ uri: image }} style={styles.previewImage} />
-          <Text style={styles.previewText}>QR code attached</Text>
+        <Text style={styles.headerTitle}>Redeem Rewards</Text>
+        <View style={styles.pointsContainer}>
+          <FontAwesome5 name="star" solid size={20} color="#FFD700" />
+          <Text style={styles.pointsText}>Your Points: 8,450</Text>
         </View>
-      )}
-
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Claim Reward</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </LinearGradient>
+      <ScrollView contentContainerStyle={styles.gridContainer}>
+        {rewards.map((reward) => (
+          <TouchableOpacity key={reward.id} style={styles.rewardCard}>
+            <ImageBackground
+              source={{ uri: reward.image }}
+              style={styles.imageBackground}
+              imageStyle={{ borderRadius: 15 }}
+            >
+              <LinearGradient
+                colors={["transparent", "rgba(0,0,0,0.8)"]}
+                style={styles.rewardOverlay}
+              >
+                <FontAwesome5
+                  name={reward.icon}
+                  size={32}
+                  color="white"
+                  style={styles.rewardIcon}
+                />
+                <Text style={styles.rewardTitle} numberOfLines={2}>
+                  {reward.title}
+                </Text>
+                <View style={styles.pointsBadge}>
+                  <Text style={styles.rewardPoints}>{`${reward.points} pts`}</Text>
+                </View>
+              </LinearGradient>
+            </ImageBackground>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: Colors.light.background,
+    flex: 1,
+    backgroundColor: "#f0f2f5",
   },
-  title: {
-    fontSize: 26,
+  header: {
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+  backButton: {
+    position: "absolute",
+    top: 60,
+    left: 20,
+    zIndex: 1,
+  },
+  headerTitle: {
+    fontSize: 24,
     fontWeight: "bold",
-    marginVertical: 20,
-    color: Colors.light.primary,
-  },
-  subText: {
-    fontSize: 14,
-    color: Colors.light.text,
-    marginBottom: 20,
+    color: "white",
     textAlign: "center",
   },
-  leaderboardContainer: {
-    width: '100%',
-    marginBottom: 20,
-    backgroundColor: Colors.light.card,
-    borderRadius: 12,
-    padding: 15,
-    elevation: 3,
-  },
-  leaderboardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 2,
-    borderBottomColor: Colors.light.primary,
-    paddingBottom: 10,
-    marginBottom: 10,
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.light.primary,
-  },
-  leaderboardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  pointsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 15,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 20,
     paddingVertical: 8,
+    paddingHorizontal: 15,
+    alignSelf: "center",
   },
-  leaderboardText: {
-    fontSize: 14,
-    color: Colors.light.text,
-  },
-  rank: { flex: 1, textAlign: 'center' },
-  user: { flex: 3 },
-  points: { flex: 2, textAlign: 'right' },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: Colors.light.primary,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 20,
-    fontSize: 16,
-    backgroundColor: "#fff",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: '100%',
-    marginBottom: 20,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.light.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    elevation: 2,
-  },
-  buttonText: {
-    color: "#fff",
-    marginLeft: 10,
-    fontWeight: "600",
-  },
-  previewBox: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  previewImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 2,
-    borderColor: Colors.light.primary,
-  },
-  previewText: {
-    color: Colors.light.primary,
-    fontWeight: "bold",
-  },
-  submitButton: {
-    backgroundColor: Colors.light.accent,
-    paddingVertical: 14,
-    paddingHorizontal: 50,
-    borderRadius: 30,
-    elevation: 3,
-  },
-  submitText: {
-    color: "#fff",
+  pointsText: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "white",
+    marginLeft: 10,
+  },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    padding: 10,
+  },
+  rewardCard: {
+    width: "45%",
+    height: 180,
+    margin: "2.5%",
+    borderRadius: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  imageBackground: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  rewardOverlay: {
+    flex: 1,
+    borderRadius: 15,
+    padding: 12,
+    justifyContent: "flex-end",
+  },
+  rewardIcon: {
+    position: "absolute",
+    top: 15,
+    left: 15,
+    opacity: 0.8,
+  },
+  rewardTitle: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 5,
+  },
+  pointsBadge: {
+    backgroundColor: "rgba(255, 215, 0, 0.85)",
+    borderRadius: 10,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    alignSelf: "flex-start",
+  },
+  rewardPoints: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "black",
   },
 });
