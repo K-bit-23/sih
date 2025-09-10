@@ -66,7 +66,7 @@ export default function SignInScreen() {
     if (role === "admin") {
       if (email === "admin" && password === "admin") {
         showAlert("👨‍💻 Admin Login", "Welcome back, Admin!");
-        router.replace("/admin");
+        router.replace("/(admin)");
       } else {
         showAlert("Login Failed", "Invalid admin credentials.");
       }
