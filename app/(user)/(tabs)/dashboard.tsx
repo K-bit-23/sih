@@ -33,7 +33,6 @@ interface CardProps {
   value: string;
   icon: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
-  trend?: string;
 }
 
 interface UserProfile {
@@ -43,21 +42,9 @@ interface UserProfile {
   avatar: string | null;
 }
 
-const InfoCard = ({ title, value, icon, color, trend }: CardProps) => (
+const InfoCard = ({ title, value, icon, color }: CardProps) => (
   <View style={[styles.card, { backgroundColor: color }]}>
-    <View style={styles.cardHeader}>
-      <FontAwesome name={icon} size={24} color="white" />
-      {trend && (
-        <View style={styles.trendContainer}>
-          <Ionicons 
-            name={trend.startsWith('+') ? 'trending-up' : 'trending-down'} 
-            size={16} 
-            color="white" 
-          />
-          <Text style={styles.trendText}>{trend}</Text>
-        </View>
-      )}
-    </View>
+    <FontAwesome name={icon} size={20} color="white" style={styles.cardIcon} />
     <Text style={styles.cardTitle}>{title}</Text>
     <Text style={styles.cardValue}>{value}</Text>
   </View>
@@ -85,8 +72,9 @@ export default function DashboardScreen() {
     try {
       const locationStatus = await AsyncStorage.getItem('locationEnabled');
       if (locationStatus) {
-        setLocationEnabled(JSON.parse(locationStatus));
-        if (JSON.parse(locationStatus)) {
+        const isEnabled = JSON.parse(locationStatus);
+        setLocationEnabled(isEnabled);
+        if (isEnabled) {
           getCurrentLocation();
         }
       }
@@ -104,7 +92,6 @@ export default function DashboardScreen() {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         });
-        
         if (address[0]) {
           setCurrentLocation(`${address[0].city}, ${address[0].region}`);
         }
@@ -126,11 +113,8 @@ export default function DashboardScreen() {
   };
 
   const loadDashboardData = async () => {
-    // Simulate loading data
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    setTimeout(() => setRefreshing(false), 1000);
   };
 
   const onRefresh = () => {
@@ -142,158 +126,90 @@ export default function DashboardScreen() {
   };
 
   const cards: CardProps[] = [
-    {
-      title: "Temperature",
-      value: temperature,
-      icon: "thermometer-three-quarters",
-      color: Colors.light.primary,
-      trend: "+2°C"
-    },
-    {
-      title: "Humidity",
-      value: humidity,
-      icon: "tint",
-      color: Colors.light.primary,
-      trend: "-5%"
-    },
-    {
-      title: "Air Quality",
-      value: airQuality,
-      icon: "leaf",
-      color: Colors.light.accent,
-      trend: "Good"
-    },
-    {
-      title: "Recyclable",
-      value: "1.8 kg",
-      icon: "recycle",
-      color: Colors.light.accent,
-      trend: "+0.3kg"
-    },
-    {
-      title: "Non-Recyclable",
-      value: "0.5 kg",
-      icon: "trash",
-      color: Colors.light.secondary,
-      trend: "-0.2kg"
-    },
-    {
-      title: "Hazardous",
-      value: "0.3 kg",
-      icon: "warning",
-      color: Colors.light.danger,
-      trend: "0kg"
-    },
+    { title: "Temperature", value: temperature, icon: "thermometer-three-quarters", color: Colors.light.primary },
+    { title: "Humidity", value: humidity, icon: "tint", color: Colors.light.primary },
+    { title: "Air Quality", value: airQuality, icon: "leaf", color: Colors.light.accent },
+    { title: "Recyclable", value: "1.8 kg", icon: "recycle", color: Colors.light.accent },
+    { title: "Non-Recyclable", value: "0.5 kg", icon: "trash", color: Colors.light.secondary },
+    { title: "Hazardous", value: "0.3 kg", icon: "warning", color: Colors.light.danger },
   ];
 
   const quickActions = [
-    { 
-      title: "Scan Waste", 
-      icon: "camera", 
-      color: Colors.light.primary,
-      route: "/(user)/(tabs)/analysis"
-    },
-    { 
-      title: "Find Bins", 
-      icon: "map-marker", 
-      color: Colors.light.accent,
-      route: "/(user)/(tabs)/maps"
-    },
-    { 
-      title: "Community", 
-      icon: "group", 
-      color: "#3498db",
-      route: "/(user)/community"
-    },
+    { title: "Scan Waste", icon: "camera", color: Colors.light.primary, route: "/(user)/(tabs)/analysis" },
+    { title: "Find Bins", icon: "map-marker", color: Colors.light.accent, route: "/(user)/(tabs)/maps" },
+    { title: "Community", icon: "group", color: "#3498db", route: "/(user)/community" },
   ];
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      <StatusBar hidden />
+      <StatusBar barStyle="light-content" />
 
-      {/* Header */}
       <LinearGradient
         colors={[Colors.light.primary, Colors.light.accent]}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <View style={styles.headerContent}>
+        <View style={styles.headerTop}>
           <View style={styles.headerLeft}>
             <Text style={styles.greeting}>Good Morning! 🌱</Text>
-            <Text style={[styles.title, { color: '#FFFFFF' }]}>Eco Dashboard</Text>
+            <Text style={styles.username}>{userProfile?.name || 'User'}</Text>
             {locationEnabled && currentLocation && (
               <View style={styles.locationContainer}>
-                <Ionicons name="location" size={14} color="rgba(255,255,255,0.8)" />
+                <Ionicons name="location-sharp" size={14} color="rgba(255,255,255,0.8)" />
                 <Text style={styles.location}>{currentLocation}</Text>
               </View>
             )}
           </View>
-          <TouchableOpacity 
-            style={styles.profileButton}
-            onPress={() => router.push('/(user)/(tabs)/settings')}
-          >
-            {userProfile?.avatar ? (
-              <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
-            ) : (
-              <View style={[styles.avatarPlaceholder]}>
-                <FontAwesome5 name="user" size={20} color={Colors.light.primary} />
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-        <View style={styles.headerActions}>
-            <TouchableOpacity
-                style={styles.headerIcon}
-                onPress={() => router.push('/(user)/iot-connect' as any)}
-            >
-                <FontAwesome5 name="wifi" size={18} color="white" />
+          <View style={styles.headerRight}>
+            <TouchableOpacity style={styles.headerIcon} onPress={() => router.push('/(user)/iot-connect' as any)}>
+              <FontAwesome5 name="wifi" size={18} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.headerIcon}
-                onPress={() => router.push('/(user)/rewards' as any)}
-            >
-                <FontAwesome5 name="trophy" size={18} color="white" />
+            <TouchableOpacity style={styles.headerIcon} onPress={() => router.push('/(user)/rewards' as any)}>
+              <FontAwesome5 name="trophy" size={18} color="white" />
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/(user)/(tabs)/settings' as any)}>
+              {userProfile?.avatar ? (
+                <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
+              ) : (
+                <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                  <FontAwesome5 name="user" size={18} color={Colors.light.primary} />
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </LinearGradient>
 
-      {/* Quick Actions */}
-      <View style={styles.quickActionsContainer}>
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.quickActionsGrid}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickActionsGrid}>
           {quickActions.map((action, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.quickActionIcon}
-              onPress={() => router.push(action.route as any)}
-            >
+            <TouchableOpacity key={index} style={styles.quickActionCard} onPress={() => router.push(action.route as any)}>
               <View style={[styles.quickActionCircle, { backgroundColor: action.color }]}>
-                <FontAwesome name={action.icon as any} size={24} color="white" />
+                <FontAwesome name={action.icon as any} size={22} color="white" />
               </View>
               <Text style={styles.quickActionText}>{action.title}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
-      {/* Live Feed */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Environmental Data</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardsContainer}>
+          {cards.map((item, index) => <InfoCard key={index} {...item} />)}
+        </ScrollView>
+      </View>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Live Feed</Text>
         <View style={styles.videoBox}>
           {videoUrl ? (
-            <Video
-              source={{ uri: videoUrl }}
-              style={styles.video}
-              useNativeControls
-              resizeMode={ResizeMode.CONTAIN}
-              shouldPlay
-            />
+            <Video source={{ uri: videoUrl }} style={styles.video} useNativeControls resizeMode={ResizeMode.CONTAIN} shouldPlay />
           ) : (
             <View style={styles.videoError}>
               <MaterialIcons name="videocam-off" size={40} color={Colors.light.text} />
@@ -304,25 +220,8 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      {/* Environmental Data */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Environmental Data</Text>
-        <View style={styles.gridContainer}>
-          {cards.map((item, index) => (
-            <InfoCard
-              key={index}
-              title={item.title}
-              value={item.value}
-              icon={item.icon}
-              color={item.color}
-              trend={item.trend}
-            />
-          ))}
-        </View>
-      </View>
-
-      {/* Recent Activity */}
-      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Recent Activity</Text>
         <WasteLogList data={wasteLog} />
       </View>
     </ScrollView>
@@ -330,205 +229,98 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: Colors.light.background 
-  },
+  container: { flex: 1, backgroundColor: '#f0f2f5' },
   header: {
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
   },
-  headerContent: {
-    backgroundColor: 'transparent',
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  headerLeft: {
+    alignItems: 'center',
     backgroundColor: 'transparent',
-    flex: 1,
   },
-  greeting: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    marginBottom: 4,
-  },
-  title: { 
-    fontSize: 28, 
-    fontWeight: "bold", 
-    marginBottom: 4,
-  },
+  headerLeft: { backgroundColor: 'transparent' },
+  greeting: { fontSize: 16, color: 'rgba(255,255,255,0.9)' },
+  username: { fontSize: 22, fontWeight: 'bold', color: 'white' },
   locationContainer: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 4,
+    backgroundColor: 'transparent',
   },
-  location: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
-    marginLeft: 4,
-  },
-  profileButton: {
-    padding: 0,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  avatarPlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerActions: {
+  location: { fontSize: 14, color: 'rgba(255,255,255,0.8)', marginLeft: 4 },
+  headerRight: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    marginTop: -40, 
-    marginRight: 50
   },
   headerIcon: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 15,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    marginRight: 12,
   },
-  section: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.light.primary,
-    marginBottom: 15,
-  },
-  quickActionsContainer: {
-    paddingHorizontal: 16,
-    marginTop: -20,
-    marginBottom: 20,
+  avatar: { width: 40, height: 40, borderRadius: 20 },
+  avatarPlaceholder: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 15,
-    marginHorizontal: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-  },
-  quickActionIcon: {
+    justifyContent: 'center',
     alignItems: 'center',
-    width: '25%',
-    marginBottom: 15,
   },
+  section: { marginTop: 25, paddingLeft: 20 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: Colors.light.text, marginBottom: 15 },
+  quickActionsGrid: { paddingRight: 20 },
+  quickActionCard: { alignItems: 'center', marginRight: 15, width: 80 },
   quickActionCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  quickActionText: {
-    color: Colors.light.text,
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
+  quickActionText: { color: Colors.light.text, fontSize: 12, fontWeight: '600', textAlign: 'center' },
+  cardsContainer: { paddingRight: 20 },
+  card: {
+    width: 130,
+    height: 130,
+    borderRadius: 20,
+    padding: 12,
+    marginRight: 15,
+    justifyContent: 'space-between',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 6,
   },
+  cardIcon: { alignSelf: 'flex-start' },
+  cardTitle: { fontSize: 14, fontWeight: "600", color: 'white', backgroundColor: 'transparent' },
+  cardValue: { fontSize: 20, fontWeight: "bold", color: 'white', backgroundColor: 'transparent', alignSelf: 'flex-end' },
   videoBox: {
-    width: "100%",
+    width: width - 40,
     height: 200,
     borderRadius: 15,
     overflow: 'hidden',
+    backgroundColor: Colors.light.card,
   },
-  video: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#000",
-  },
+  video: { width: "100%", height: "100%" },
   videoError: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.light.card,
-    padding: 20,
   },
-  errorText: { 
-    marginTop: 12, 
-    color: Colors.light.text, 
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  errorSubText: {
-    marginTop: 4,
-    color: Colors.light.text + '80',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  gridContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  card: {
-    width: (width - 48) / 2,
-    borderRadius: 15,
-    padding: 16,
-    marginBottom: 12,
-  },
-  cardHeader: {
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  trendContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  trendText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: '600',
-    marginLeft: 2,
-  },
-  cardTitle: { 
-    fontSize: 14, 
-    fontWeight: "600", 
-    color: 'white',
-    marginBottom: 4,
-    backgroundColor: 'transparent',
-  },
-  cardValue: { 
-    fontSize: 18, 
-    fontWeight: "bold", 
-    color: 'white',
-    backgroundColor: 'transparent',
-  },
+  errorText: { marginTop: 12, color: Colors.light.text, fontWeight: "600", fontSize: 16 },
+  errorSubText: { marginTop: 4, color: Colors.light.text + '80', fontSize: 14, textAlign: 'center' },
 });
