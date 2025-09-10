@@ -214,7 +214,7 @@ export default function DashboardScreen() {
                 <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
               ) : (
                 <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                  <FontAwesome5 name="user" size={18} color={Colors.light.primary} />
+                  <FontAwesome5 name="user" size={18} color="white" />
                 </View>
               )}
             </TouchableOpacity>
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   avatar: { width: 44, height: 44, borderRadius: 22 },
   avatarPlaceholder: {
-    backgroundColor: "white",
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     width: width - 40,
     height: 180,
     borderRadius: 15,
-    overflow: "hidden",
+    overflow: "hidden",_RESPONSE
     backgroundColor: Colors.light.card,
     alignSelf: "center",
   },
