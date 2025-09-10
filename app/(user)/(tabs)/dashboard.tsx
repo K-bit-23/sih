@@ -11,6 +11,8 @@ import {
   Easing,
   Modal,
   FlatList,
+  PermissionsAndroid,
+  Platform,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import WasteLogList from "@/components/WasteLogList";
@@ -26,6 +28,9 @@ import Colors from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BleManager, Device } from "react-native-ble-plx";
+
+const bleManager = new BleManager();
 
 const wasteLog = [
   { id: "1", type: "Organic", weight: "1.2 kg", date: "2025-01-08", status: "Processed" },
@@ -33,13 +38,6 @@ const wasteLog = [
   { id: "3", type: "Hazardous", weight: "0.3 kg", date: "2025-01-07", status: "Pending" },
   { id: "4", type: "Organic", weight: "2.1 kg", date: "2025-01-06", status: "Processed" },
   { id: "5", type: "Plastic", weight: "0.5 kg", date: "2025-01-06", status: "Collected" },
-];
-
-const mockBluetoothDevices = [
-  { id: "1", name: "Smart Bin 1" },
-  { id: "2", name: "Eco-Tracker" },
-  { id: "3", name: "Green_Device" },
-  { id: "4", name: "Recycle-Bot" },
 ];
 
 const { width } = Dimensions.get("window");
@@ -85,6 +83,8 @@ export default function DashboardScreen() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [greeting, setGreeting] = useState("");
   const [isBluetoothModalVisible, setBluetoothModalVisible] = useState(false);
+  const [discoveredDevices, setDiscoveredDevices] = useState<Device[]>([]);
+  const [isScanning, setIsScanning] = useState(false);
 
   const orbitAnim = useRef(new Animated.Value(0)).current;
 
@@ -104,6 +104,62 @@ export default function DashboardScreen() {
     outputRange: ["0deg", "360deg"],
   });
 
+  const requestBluetoothPermission = async () => {
+    if (Platform.OS === "android") {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Bluetooth Permission",
+          message: "This app needs access to your location to scan for Bluetooth devices.",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
+  };
+
+  const startScan = async () => {
+    const hasPermission = await requestBluetoothPermission();
+    if (!hasPermission) {
+      console.log("Bluetooth permission denied");
+      return;
+    }
+
+    setIsScanning(true);
+    setDiscoveredDevices([]);
+
+    bleManager.startDeviceScan(null, null, (error, device) => {
+      if (error) {
+        console.error(error);
+        setIsScanning(false);
+        return;
+      }
+      if (device && device.name) {
+        setDiscoveredDevices((prevDevices) => {
+          if (!prevDevices.find((d) => d.id === device.id)) {
+            return [...prevDevices, device];
+          }
+          return prevDevices;
+        });
+      }
+    });
+
+    setTimeout(() => {
+      bleManager.stopDeviceScan();
+      setIsScanning(false);
+    }, 10000); // Scan for 10 seconds
+  };
+
+  const toggleBluetoothModal = () => {
+    if (!isBluetoothModalVisible) {
+      startScan();
+    }
+    setBluetoothModalVisible(!isBluetoothModalVisible);
+  };
+
   const [temperature] = useState("28°C");
   const [humidity] = useState("65%");
   const [airQuality] = useState("Good");
@@ -115,10 +171,6 @@ export default function DashboardScreen() {
     loadDashboardData();
     loadUserProfile();
   }, []);
-
-  const toggleBluetoothModal = () => {
-    setBluetoothModalVisible(!isBluetoothModalVisible);
-  };
 
   const checkLocationStatus = async () => {
     try {
@@ -250,9 +302,9 @@ export default function DashboardScreen() {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Nearby Bluetooth Devices</Text>
+            <Text style={styles.modalTitle}>{isScanning ? "Scanning..." : "Nearby Devices"}</Text>
             <FlatList
-              data={mockBluetoothDevices}
+              data={discoveredDevices}
               keyExtractor={(item) => item.id}
               style={{ width: "100%" }}
               renderItem={({ item }) => (
