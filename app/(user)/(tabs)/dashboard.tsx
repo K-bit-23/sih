@@ -184,6 +184,9 @@ export default function DashboardScreen() {
             <TouchableOpacity style={styles.headerIcon} onPress={() => router.push("/(user)/iot-connect" as any)}>
               <FontAwesome5 name="wifi" size={18} color="white" />
             </TouchableOpacity>
+            <TouchableOpacity style={styles.headerIcon} onPress={() => router.push("/(user)/rewards" as any)}>
+              <FontAwesome5 name="trophy" size={18} color="white" />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push("/(user)/(tabs)/settings" as any)}>
               {userProfile?.avatar ? (
                 <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
@@ -203,9 +206,9 @@ export default function DashboardScreen() {
         )}
       </LinearGradient>
 
-      <View style={[styles.section, styles.quickActionsSection]}>
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.quickActionsGrid}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickActionsContainer}>
           {quickActions.map((action, index) => (
             <TouchableOpacity
               key={index}
@@ -218,7 +221,7 @@ export default function DashboardScreen() {
               <Text style={styles.quickActionText}>{action.title}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
       <View style={styles.section}>
@@ -310,12 +313,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  section: { marginTop: 20, paddingLeft: 20 },
-  quickActionsSection: { marginTop: -20 },
+  section: { marginTop: 25, },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingLeft: 20,
     paddingRight: 20,
   },
   sectionTitle: {
@@ -323,22 +326,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.light.text,
     marginBottom: 15,
+    paddingLeft: 20,
   },
   viewAll: {
     fontSize: 14,
     color: Colors.light.primary,
     fontWeight: '600',
   },
-  quickActionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingRight: 20,
+  quickActionsContainer: {
+    paddingHorizontal: 20,
   },
   quickActionCard: {
     alignItems: "center",
-    width: (width - 100) / 4,
-    marginBottom: 15,
+    marginRight: 15,
+    width: 80,
   },
   quickActionCircle: {
     width: 60,
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
   },
-  cardsContainer: { paddingBottom: 10, paddingRight: 20 },
+  cardsContainer: { paddingLeft: 20, paddingBottom: 10, paddingRight: 5 },
   card: {
     width: 140,
     height: 120,
@@ -393,6 +394,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: "hidden",
     backgroundColor: Colors.light.card,
+    marginLeft: 20,
   },
   video: { width: "100%", height: "100%" },
   videoError: {
