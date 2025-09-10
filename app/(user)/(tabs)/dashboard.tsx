@@ -199,17 +199,17 @@ export default function DashboardScreen() {
           </View>
           <View style={styles.headerRight}>
             <Animated.View style={[styles.orbitContainer, { transform: [{ rotate: rotation }] }]}>
-              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon1]} onPress={() => router.push("/(user)/iot-connect")}>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon1]} onPress={() => router.push("/(user)/iot-connect" as any)}>
                 <FontAwesome5 name="wifi" size={16} color="white" />
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon2]} onPress={() => router.push("/(user)/iot-connect")}>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon2]} onPress={() => router.push("/(user)/iot-connect" as any)}>
                 <FontAwesome5 name="bluetooth-b" size={16} color="white" />
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon3]} onPress={() => router.push("/(user)/rewards")}>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon3]} onPress={() => router.push("/(user)/rewards" as any)}>
                 <FontAwesome5 name="trophy" size={16} color="white" />
               </TouchableOpacity>
             </Animated.View>
-            <TouchableOpacity onPress={() => router.push("/(user)/(tabs)/settings")} style={styles.avatarButton}>
+            <TouchableOpacity onPress={() => router.push("/(user)/(tabs)/settings" as any)} style={styles.avatarButton}>
               {userProfile?.avatar ? (
                 <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
               ) : (
