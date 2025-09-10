@@ -9,6 +9,8 @@ import {
   Image,
   Animated,
   Easing,
+  Modal,
+  FlatList,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import WasteLogList from "@/components/WasteLogList";
@@ -31,6 +33,13 @@ const wasteLog = [
   { id: "3", type: "Hazardous", weight: "0.3 kg", date: "2025-01-07", status: "Pending" },
   { id: "4", type: "Organic", weight: "2.1 kg", date: "2025-01-06", status: "Processed" },
   { id: "5", type: "Plastic", weight: "0.5 kg", date: "2025-01-06", status: "Collected" },
+];
+
+const mockBluetoothDevices = [
+  { id: "1", name: "Smart Bin 1" },
+  { id: "2", name: "Eco-Tracker" },
+  { id: "3", name: "Green_Device" },
+  { id: "4", name: "Recycle-Bot" },
 ];
 
 const { width } = Dimensions.get("window");
@@ -75,6 +84,7 @@ export default function DashboardScreen() {
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [greeting, setGreeting] = useState("");
+  const [isBluetoothModalVisible, setBluetoothModalVisible] = useState(false);
 
   const orbitAnim = useRef(new Animated.Value(0)).current;
 
@@ -105,6 +115,10 @@ export default function DashboardScreen() {
     loadDashboardData();
     loadUserProfile();
   }, []);
+
+  const toggleBluetoothModal = () => {
+    setBluetoothModalVisible(!isBluetoothModalVisible);
+  };
 
   const checkLocationStatus = async () => {
     try {
@@ -202,7 +216,7 @@ export default function DashboardScreen() {
               <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon1]} onPress={() => router.push("/(user)/iot-connect" as any)}>
                 <FontAwesome5 name="wifi" size={16} color="white" />
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon2]} onPress={() => router.push("/(user)/iot-connect" as any)}>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon2]} onPress={toggleBluetoothModal}>
                 <FontAwesome5 name="bluetooth-b" size={16} color="white" />
               </TouchableOpacity>
               <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon3]} onPress={() => router.push("/(user)/rewards" as any)}>
@@ -214,7 +228,7 @@ export default function DashboardScreen() {
                 <Image source={{ uri: userProfile.avatar }} style={styles.avatar} />
               ) : (
                 <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                  <FontAwesome5 name="user" size={18} color="white" />
+                  <FontAwesome5 name="user" size={18} color={Colors.light.primary} />
                 </View>
               )}
             </TouchableOpacity>
@@ -227,6 +241,38 @@ export default function DashboardScreen() {
           </View>
         )}
       </LinearGradient>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isBluetoothModalVisible}
+        onRequestClose={toggleBluetoothModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Nearby Bluetooth Devices</Text>
+            <FlatList
+              data={mockBluetoothDevices}
+              keyExtractor={(item) => item.id}
+              style={{ width: "100%" }}
+              renderItem={({ item }) => (
+                <View style={styles.deviceItem}>
+                  <Text style={styles.deviceName}>{item.name}</Text>
+                  <TouchableOpacity style={styles.connectButton}>
+                    <Text style={styles.connectButtonText}>Connect</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={toggleBluetoothModal}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Quick Actions</Text>
@@ -331,7 +377,7 @@ const styles = StyleSheet.create({
   },
   avatar: { width: 44, height: 44, borderRadius: 22 },
   avatarPlaceholder: {
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -447,5 +493,72 @@ const styles = StyleSheet.create({
     color: Colors.light.text,
     fontWeight: "600",
     fontSize: 14,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: "85%",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: Colors.light.text,
+  },
+  deviceItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    width: "100%",
+  },
+  deviceName: {
+    fontSize: 16,
+    color: Colors.light.text,
+  },
+  connectButton: {
+    backgroundColor: Colors.light.primary,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+  },
+  connectButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  closeButton: {
+    backgroundColor: Colors.light.accent,
+    borderRadius: 20,
+    padding: 12,
+    elevation: 2,
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 16,
   },
 });
