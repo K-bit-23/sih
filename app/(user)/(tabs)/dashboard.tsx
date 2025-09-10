@@ -205,12 +205,6 @@ export default function DashboardScreen() {
       color: "#3498db",
       route: "/(user)/community"
     },
-    { 
-      title: "Education", 
-      icon: "book", 
-      color: "#9b59b6",
-      route: "/(user)/education"
-    },
   ];
 
   return (
@@ -255,18 +249,16 @@ export default function DashboardScreen() {
         </View>
         <View style={styles.headerActions}>
             <TouchableOpacity
-                style={styles.headerActionItem}
+                style={styles.headerIcon}
                 onPress={() => router.push('/(user)/iot-connect' as any)}
             >
-                <FontAwesome5 name="wifi" size={22} color="white" />
-                <Text style={styles.headerActionText}>IoT</Text>
+                <FontAwesome5 name="wifi" size={18} color="white" />
             </TouchableOpacity>
             <TouchableOpacity
-                style={styles.headerActionItem}
+                style={styles.headerIcon}
                 onPress={() => router.push('/(user)/rewards' as any)}
             >
-                <FontAwesome5 name="trophy" size={22} color="white" />
-                <Text style={styles.headerActionText}>Rewards</Text>
+                <FontAwesome5 name="trophy" size={18} color="white" />
             </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -344,7 +336,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 50,
-    paddingBottom: 30,
+    paddingBottom: 20,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -401,22 +393,17 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    marginTop: 15,
+    marginTop: -40, 
+    marginRight: 50
   },
-  headerActionItem: {
-    flexDirection: 'row',
+  headerIcon: {
+    justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 20,
+    marginLeft: 15,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-  },
-  headerActionText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginLeft: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
   section: {
     paddingHorizontal: 16,
@@ -430,7 +417,7 @@ const styles = StyleSheet.create({
   },
   quickActionsContainer: {
     paddingHorizontal: 16,
-    marginTop: -30,
+    marginTop: -20,
     marginBottom: 20,
     backgroundColor: 'white',
     borderRadius: 20,
