@@ -49,15 +49,6 @@ const TabLayout = () => {
           ),
         }}
       />
-       <Tabs.Screen
-        name="iot-connect"
-        options={{
-          title: t("iot"),
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="hardware-chip-outline" size={24} color={color} />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="settings"
         options={{
