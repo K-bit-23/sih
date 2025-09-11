@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   Linking,
   ActivityIndicator,
+  View,
+  Text,
 } from "react-native";
-import { View, Text } from "@/components/Themed";
 import { WebView } from "react-native-webview";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as Location from 'expo-location';
-import Colors from '@/constants/Colors';
-import { useLanguage } from '@/context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Open directions
 function openDirections(lat: number, lng: number) {
@@ -59,10 +59,10 @@ export default function MapsScreen() {
 
   const getMarkerColor = (typeKey: string) => {
     switch (typeKey) {
-      case 'recyclable': return Colors.light.accent;
-      case 'organic': return Colors.light.primary;
-      case 'hazardous': return Colors.light.danger;
-      default: return Colors.light.secondary;
+      case 'recyclable': return '#00BCD4';
+      case 'organic': return '#4CAF50';
+      case 'hazardous': return '#F44336';
+      default: return '#FF9800';
     }
   };
 
@@ -95,7 +95,7 @@ export default function MapsScreen() {
           </View>
         ) : !location ? (
           <View style={styles.messageBox}>
-            <ActivityIndicator size="large" color={Colors.light.primary} />
+            <ActivityIndicator size="large" color={'#4CAF50'} />
             <Text style={styles.loadingText}>Finding your location...</Text>
           </View>
         ) : (
@@ -137,7 +137,7 @@ export default function MapsScreen() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: Colors.light.background 
+    backgroundColor: '#fff' 
   },
   mapContainer: {
     flex: 1,
@@ -158,17 +158,17 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: Colors.light.text,
+    color: '#000',
   },
   errorText: {
     fontSize: 16,
-    color: Colors.light.danger,
+    color: '#F44336',
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.light.primary,
+    color: '#4CAF50',
     marginBottom: 12,
     marginLeft: 16,
   },
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   binName: {
     fontSize: 14,
     fontWeight: "bold",
-    color: Colors.light.text,
+    color: '#000',
     marginTop: 8,
     textAlign: "center",
   },
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   },
   tapText: {
     fontSize: 11,
-    color: Colors.light.secondary,
+    color: '#FF9800',
     fontStyle: "italic",
     textAlign: "center",
   },

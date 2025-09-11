@@ -8,10 +8,9 @@ import {
   ScrollView,
   ActivityIndicator,
   Modal,
+  View,
 } from 'react-native';
-import { View } from '../../components/Themed';
 import { FontAwesome5 } from '@expo/vector-icons';
-import Colors from '../../constants/Colors';
 import { useLanguage } from '../../context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -168,7 +167,7 @@ export default function IoTConnectScreen() {
       case 'connecting':
         return '#FF9800';
       default:
-        return Colors.light.text;
+        return '#000';
     }
   };
 
@@ -196,16 +195,16 @@ export default function IoTConnectScreen() {
       <View style={styles.deviceStats}>
         {device.batteryLevel && (
           <View style={styles.statItem}>
-            <FontAwesome5 name="battery-three-quarters" size={14} color={Colors.light.text} />
+            <FontAwesome5 name="battery-three-quarters" size={14} color={'#000'} />
             <Text style={styles.statText}>{device.batteryLevel}%</Text>
           </View>
         )}
         <View style={styles.statItem}>
-          <FontAwesome5 name="wifi" size={14} color={Colors.light.text} />
+          <FontAwesome5 name="wifi" size={14} color={'#000'} />
           <Text style={styles.statText}>{device.wifiSsid}</Text>
         </View>
         <View style={styles.statItem}>
-          <FontAwesome5 name="clock" size={14} color={Colors.light.text} />
+          <FontAwesome5 name="clock" size={14} color={'#000'} />
           <Text style={styles.statText}>{device.lastSeen.toLocaleDateString()}</Text>
         </View>
       </View>
@@ -216,19 +215,19 @@ export default function IoTConnectScreen() {
           <View style={styles.sensorGrid}>
             {device.sensorData.temperature && (
               <View style={styles.sensorItem}>
-                <FontAwesome5 name="thermometer-half" size={16} color={Colors.light.primary} />
+                <FontAwesome5 name="thermometer-half" size={16} color={'#4CAF50'} />
                 <Text style={styles.sensorValue}>{device.sensorData.temperature}°C</Text>
               </View>
             )}
             {device.sensorData.humidity && (
               <View style={styles.sensorItem}>
-                <FontAwesome5 name="tint" size={16} color={Colors.light.accent} />
+                <FontAwesome5 name="tint" size={16} color={'#00BCD4'} />
                 <Text style={styles.sensorValue}>{device.sensorData.humidity}%</Text>
               </View>
             )}
             {device.sensorData.fillLevel !== undefined && (
               <View style={styles.sensorItem}>
-                <FontAwesome5 name="chart-bar" size={16} color={Colors.light.secondary} />
+                <FontAwesome5 name="chart-bar" size={16} color={'#FF9800'} />
                 <Text style={styles.sensorValue}>{device.sensorData.fillLevel}%</Text>
               </View>
             )}
@@ -241,7 +240,7 @@ export default function IoTConnectScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.light.primary} />
+        <ActivityIndicator size="large" color={'#4CAF50'} />
         <Text style={styles.loadingText}>Loading devices...</Text>
       </View>
     );
@@ -249,7 +248,7 @@ export default function IoTConnectScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={[Colors.light.primary, Colors.light.accent]} style={styles.header}>
+      <LinearGradient colors={['#4CAF50', '#00BCD4']} style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <FontAwesome5 name="arrow-left" size={20} color="white" />
         </TouchableOpacity>
@@ -262,7 +261,7 @@ export default function IoTConnectScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {connectedDevices.length === 0 ? (
           <View style={styles.emptyState}>
-            <FontAwesome5 name="microchip" size={60} color={Colors.light.text + '40'} />
+            <FontAwesome5 name="microchip" size={60} color={'#000' + '40'} />
             <Text style={styles.emptyTitle}>No Devices Connected</Text>
             <Text style={styles.emptySubtitle}>
               Connect your first IoT device to start monitoring your waste management system.
@@ -289,7 +288,7 @@ export default function IoTConnectScreen() {
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowAddDevice(false)}>
-              <FontAwesome5 name="times" size={24} color={Colors.light.text} />
+              <FontAwesome5 name="times" size={24} color={'#000'} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Add New Device</Text>
             <View style={{ width: 24 }} />
@@ -315,7 +314,7 @@ export default function IoTConnectScreen() {
                     <FontAwesome5
                       name={type.icon as any}
                       size={20}
-                      color={deviceType === type.key ? 'white' : Colors.light.text}
+                      color={deviceType === type.key ? 'white' : '#000'}
                     />
                     <Text
                       style={[
@@ -331,7 +330,7 @@ export default function IoTConnectScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <FontAwesome5 name="tag" size={20} color={Colors.light.primary} />
+              <FontAwesome5 name="tag" size={20} color={'#4CAF50'} />
               <TextInput
                 style={styles.input}
                 placeholder="Device Name"
@@ -341,7 +340,7 @@ export default function IoTConnectScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <FontAwesome5 name="microchip" size={20} color={Colors.light.primary} />
+              <FontAwesome5 name="microchip" size={20} color={'#4CAF50'} />
               <TextInput
                 style={styles.input}
                 placeholder="Device ID"
@@ -351,7 +350,7 @@ export default function IoTConnectScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <FontAwesome5 name="wifi" size={20} color={Colors.light.primary} />
+              <FontAwesome5 name="wifi" size={20} color={'#4CAF50'} />
               <TextInput
                 style={styles.input}
                 placeholder="Wi-Fi Network Name"
@@ -361,7 +360,7 @@ export default function IoTConnectScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <FontAwesome5 name="lock" size={20} color={Colors.light.primary} />
+              <FontAwesome5 name="lock" size={20} color={'#4CAF50'} />
               <TextInput
                 style={styles.input}
                 placeholder="Wi-Fi Password"
@@ -392,18 +391,18 @@ export default function IoTConnectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: '#fff',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.light.background,
+    backgroundColor: '#fff',
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: Colors.light.text,
+    color: '#000',
   },
   header: {
     flexDirection: 'row',
@@ -447,19 +446,19 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: '#000',
     marginTop: 20,
     marginBottom: 10,
   },
   emptySubtitle: {
     fontSize: 16,
-    color: Colors.light.text + '80',
+    color: '#000' + '80',
     textAlign: 'center',
     marginBottom: 30,
     paddingHorizontal: 20,
   },
   emptyButton: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: '#4CAF50',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
@@ -475,11 +474,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: '#000',
     marginBottom: 20,
   },
   deviceCard: {
-    backgroundColor: Colors.light.card,
+    backgroundColor: '#f8f8f8',
     borderRadius: 15,
     padding: 16,
     marginBottom: 16,
@@ -514,12 +513,12 @@ const styles = StyleSheet.create({
   deviceName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: '#000',
     marginBottom: 2,
   },
   deviceId: {
     fontSize: 14,
-    color: Colors.light.text + '80',
+    color: '#000' + '80',
   },
   statusBadge: {
     paddingHorizontal: 12,
@@ -544,18 +543,18 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 12,
-    color: Colors.light.text + '80',
+    color: '#000' + '80',
     marginLeft: 6,
   },
   sensorData: {
     borderTopWidth: 1,
-    borderTopColor: Colors.light.background,
+    borderTopColor: '#fff',
     paddingTop: 12,
   },
   sensorTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: '#000',
     marginBottom: 8,
   },
   sensorGrid: {
@@ -567,13 +566,13 @@ const styles = StyleSheet.create({
   },
   sensorValue: {
     fontSize: 12,
-    color: Colors.light.text,
+    color: '#000',
     marginTop: 4,
     fontWeight: '600',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: '#fff',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -583,12 +582,12 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingTop: 50,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.background,
+    borderBottomColor: '#fff',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: '#000',
   },
   modalContent: {
     flex: 1,
@@ -600,7 +599,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: '#000',
     marginBottom: 10,
   },
   typeSelector: {
@@ -616,16 +615,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: Colors.light.background,
-    backgroundColor: Colors.light.card,
+    borderColor: '#fff',
+    backgroundColor: '#f8f8f8',
   },
   typeOptionActive: {
-    backgroundColor: Colors.light.primary,
-    borderColor: Colors.light.primary,
+    backgroundColor: '#4CAF50',
+    borderColor: '#4CAF50',
   },
   typeLabel: {
     fontSize: 12,
-    color: Colors.light.text,
+    color: '#000',
     marginLeft: 6,
     fontWeight: '600',
   },
@@ -635,29 +634,29 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.light.card,
+    backgroundColor: '#f8f8f8',
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: Colors.light.background,
+    borderColor: '#fff',
   },
   input: {
     flex: 1,
     height: 50,
     marginLeft: 10,
     fontSize: 16,
-    color: Colors.light.text,
+    color: '#000',
   },
   connectButton: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: '#4CAF50',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
   },
   connectButtonDisabled: {
-    backgroundColor: Colors.light.text + '40',
+    backgroundColor: '#000' + '40',
   },
   connectButtonText: {
     color: 'white',
