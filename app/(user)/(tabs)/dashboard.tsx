@@ -30,8 +30,6 @@ import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BleManager, Device } from "react-native-ble-plx";
 
-const bleManager = new BleManager();
-
 const wasteLog = [
   { id: "1", type: "Organic", weight: "1.2 kg", date: "2025-01-08", status: "Processed" },
   { id: "2", type: "Recyclable", weight: "0.8 kg", date: "2025-01-07", status: "Collected" },
@@ -86,6 +84,21 @@ export default function DashboardScreen() {
   const [discoveredDevices, setDiscoveredDevices] = useState<Device[]>([]);
   const [isScanning, setIsScanning] = useState(false);
 
+  // Initialize BLE manager safely
+  const [bleManager, setBleManager] = useState<BleManager | null>(null);
+
+  useEffect(() => {
+    // Only initialize BLE manager on native platforms
+    if (Platform.OS !== 'web') {
+      try {
+        const manager = new BleManager();
+        setBleManager(manager);
+      } catch (error) {
+        console.log('BLE not available:', error);
+      }
+    }
+  }, []);
+
   const orbitAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -122,6 +135,11 @@ export default function DashboardScreen() {
   };
 
   const startScan = async () => {
+    if (!bleManager) {
+      console.log('BLE Manager not available');
+      return;
+    }
+
     const hasPermission = await requestBluetoothPermission();
     if (!hasPermission) {
       console.log("Bluetooth permission denied");
@@ -148,12 +166,19 @@ export default function DashboardScreen() {
     });
 
     setTimeout(() => {
-      bleManager.stopDeviceScan();
+      if (bleManager) {
+        bleManager.stopDeviceScan();
+      }
       setIsScanning(false);
     }, 10000); // Scan for 10 seconds
   };
 
   const toggleBluetoothModal = () => {
+    if (!bleManager && Platform.OS !== 'web') {
+      console.log('Bluetooth not available on this device');
+      return;
+    }
+    
     if (!isBluetoothModalVisible) {
       startScan();
     }
