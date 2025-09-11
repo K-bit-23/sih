@@ -84,11 +84,12 @@ export default function DashboardScreen() {
   const [isBluetoothModalVisible, setBluetoothModalVisible] = useState(false);
   const [discoveredDevices, setDiscoveredDevices] = useState<Device[]>([]);
   const [isScanning, setIsScanning] = useState(false);
-  const bleManager = new BleManager();
+  const bleManager = useRef<BleManager | null>(null);
 
   const orbitAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    bleManager.current = new BleManager();
     Animated.loop(
       Animated.timing(orbitAnim, {
         toValue: 1,
@@ -97,6 +98,10 @@ export default function DashboardScreen() {
         useNativeDriver: true,
       })
     ).start();
+
+    return () => {
+      bleManager.current?.destroy();
+    };
   }, []);
 
   const rotation = orbitAnim.interpolate({
@@ -129,7 +134,7 @@ export default function DashboardScreen() {
       return;
     }
 
-    bleManager.startDeviceScan(null, null, (error, device) => {
+    bleManager.current?.startDeviceScan(null, null, (error, device) => {
       setIsScanning(true);
       if (error) {
         console.error(error);
@@ -148,7 +153,7 @@ export default function DashboardScreen() {
     });
 
     setTimeout(() => {
-      bleManager.stopDeviceScan();
+      bleManager.current?.stopDeviceScan();
       setIsScanning(false);
     }, 5000);
   };
