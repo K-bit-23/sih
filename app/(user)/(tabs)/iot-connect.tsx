@@ -13,11 +13,9 @@ import {
 import { View } from '../../components/Themed';
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import Colors from '../../constants/Colors';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { db } from '../firebase';
-import { collection, addDoc, getDocs, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 
 interface IoTDevice {
   id: string;
@@ -34,6 +32,49 @@ interface IoTDevice {
     fillLevel?: number;
   };
 }
+
+// Mock Data
+const mockDevices: IoTDevice[] = [
+  {
+    id: '1',
+    deviceId: 'a1:b2:c3:d4:e5:f6',
+    name: 'Smart Bin 1',
+    type: 'smart-bin',
+    status: 'online',
+    lastSeen: new Date(),
+    wifiSsid: 'Eco-Net',
+    batteryLevel: 80,
+    sensorData: {
+      temperature: 25,
+      humidity: 60,
+      fillLevel: 45,
+    },
+  },
+  {
+    id: '2',
+    deviceId: 'a2:b3:c4:d5:e6:f7',
+    name: 'Environmental Sensor',
+    type: 'sensor',
+    status: 'offline',
+    lastSeen: new Date(Date.now() - 86400000),
+    wifiSsid: 'City-WiFi',
+    batteryLevel: 20,
+    sensorData: {
+      temperature: 12,
+      humidity: 90,
+    },
+  },
+  {
+    id: '3',
+    deviceId: 'a3:b4:c5:d6:e7:f8',
+    name: 'Recycling Center Cam',
+    type: 'camera',
+    status: 'connecting',
+    lastSeen: new Date(),
+    wifiSsid: 'Public-WiFi',
+    batteryLevel: 95,
+  },
+];
 
 export default function IoTConnectScreen() {
   const router = useRouter();
@@ -54,37 +95,12 @@ export default function IoTConnectScreen() {
   }, []);
 
   const loadConnectedDevices = async () => {
-    try {
-      setLoading(true);
-      const devicesRef = collection(db, 'iot_devices');
-      const q = query(devicesRef, orderBy('lastSeen', 'desc'));
-      
-      // Real-time listener for device updates
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const devices: IoTDevice[] = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          devices.push({
-            id: doc.id,
-            deviceId: data.deviceId,
-            name: data.name,
-            type: data.type,
-            status: data.status,
-            lastSeen: data.lastSeen?.toDate() || new Date(),
-            wifiSsid: data.wifiSsid,
-            batteryLevel: data.batteryLevel,
-            sensorData: data.sensorData,
-          });
-        });
-        setConnectedDevices(devices);
-        setLoading(false);
-      });
-
-      return () => unsubscribe();
-    } catch (error) {
-      console.error('Error loading devices:', error);
+    setLoading(true);
+    // Simulate loading data
+    setTimeout(() => {
+      setConnectedDevices(mockDevices);
       setLoading(false);
-    }
+    }, 1500);
   };
 
   const handleConnect = async () => {
@@ -95,12 +111,10 @@ export default function IoTConnectScreen() {
 
     setIsConnecting(true);
 
-    try {
-      // Simulate device connection process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Add device to Firebase
-      const deviceData = {
+    // Simulate device connection process
+    setTimeout(() => {
+      const newDevice: IoTDevice = {
+        id: Math.random().toString(),
         deviceId,
         name: deviceName,
         type: deviceType,
@@ -113,15 +127,13 @@ export default function IoTConnectScreen() {
           humidity: Math.floor(Math.random() * 60) + 30,
           fillLevel: Math.floor(Math.random() * 100),
         },
-        createdAt: new Date(),
       };
 
-      await addDoc(collection(db, 'iot_devices'), deviceData);
-
+      setConnectedDevices([newDevice, ...connectedDevices]);
       setIsConnecting(false);
       setConnected(true);
       setShowAddDevice(false);
-      
+
       // Reset form
       setDeviceId('');
       setDeviceName('');
@@ -132,28 +144,32 @@ export default function IoTConnectScreen() {
         'Device Connected!',
         `Successfully connected ${deviceName} to your network.`
       );
-    } catch (error) {
-      console.error('Error connecting device:', error);
-      setIsConnecting(false);
-      Alert.alert('Connection Failed', 'Failed to connect device. Please try again.');
-    }
+    }, 2000);
   };
 
   const getDeviceIcon = (type: string) => {
     switch (type) {
-      case 'smart-bin': return 'trash-alt';
-      case 'sensor': return 'thermometer-half';
-      case 'camera': return 'camera';
-      default: return 'microchip';
+      case 'smart-bin':
+        return 'trash-alt';
+      case 'sensor':
+        return 'thermometer-half';
+      case 'camera':
+        return 'camera';
+      default:
+        return 'microchip';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'online': return '#4CAF50';
-      case 'offline': return '#F44336';
-      case 'connecting': return '#FF9800';
-      default: return Colors.light.text;
+      case 'online':
+        return '#4CAF50';
+      case 'offline':
+        return '#F44336';
+      case 'connecting':
+        return '#FF9800';
+      default:
+        return Colors.light.text;
     }
   };
 
@@ -162,10 +178,10 @@ export default function IoTConnectScreen() {
       <View style={styles.deviceHeader}>
         <View style={styles.deviceInfo}>
           <View style={[styles.deviceIconContainer, { backgroundColor: getStatusColor(device.status) + '20' }]}>
-            <FontAwesome5 
-              name={getDeviceIcon(device.type) as any} 
-              size={20} 
-              color={getStatusColor(device.status)} 
+            <FontAwesome5
+              name={getDeviceIcon(device.type) as any}
+              size={20}
+              color={getStatusColor(device.status)}
             />
           </View>
           <View style={styles.deviceDetails}>
@@ -191,9 +207,7 @@ export default function IoTConnectScreen() {
         </View>
         <View style={styles.statItem}>
           <FontAwesome5 name="clock" size={14} color={Colors.light.text} />
-          <Text style={styles.statText}>
-            {device.lastSeen.toLocaleDateString()}
-          </Text>
+          <Text style={styles.statText}>{device.lastSeen.toLocaleDateString()}</Text>
         </View>
       </View>
 
@@ -236,21 +250,12 @@ export default function IoTConnectScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={[Colors.light.primary, Colors.light.accent]}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+      <LinearGradient colors={[Colors.light.primary, Colors.light.accent]} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <FontAwesome5 name="arrow-left" size={20} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerText}>IoT Devices</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowAddDevice(true)}
-        >
+        <TouchableOpacity style={styles.addButton} onPress={() => setShowAddDevice(true)}>
           <FontAwesome5 name="plus" size={20} color="white" />
         </TouchableOpacity>
       </LinearGradient>
@@ -263,10 +268,7 @@ export default function IoTConnectScreen() {
             <Text style={styles.emptySubtitle}>
               Connect your first IoT device to start monitoring your waste management system.
             </Text>
-            <TouchableOpacity
-              style={styles.emptyButton}
-              onPress={() => setShowAddDevice(true)}
-            >
+            <TouchableOpacity style={styles.emptyButton} onPress={() => setShowAddDevice(true)}>
               <Text style={styles.emptyButtonText}>Add Device</Text>
             </TouchableOpacity>
           </View>
@@ -307,19 +309,21 @@ export default function IoTConnectScreen() {
                     key={type.key}
                     style={[
                       styles.typeOption,
-                      deviceType === type.key && styles.typeOptionActive
+                      deviceType === type.key && styles.typeOptionActive,
                     ]}
                     onPress={() => setDeviceType(type.key)}
                   >
-                    <FontAwesome5 
-                      name={type.icon as any} 
-                      size={20} 
-                      color={deviceType === type.key ? 'white' : Colors.light.text} 
+                    <FontAwesome5
+                      name={type.icon as any}
+                      size={20}
+                      color={deviceType === type.key ? 'white' : Colors.light.text}
                     />
-                    <Text style={[
-                      styles.typeLabel,
-                      deviceType === type.key && styles.typeLabelActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.typeLabel,
+                        deviceType === type.key && styles.typeLabelActive,
+                      ]}
+                    >
                       {type.label}
                     </Text>
                   </TouchableOpacity>
@@ -368,8 +372,8 @@ export default function IoTConnectScreen() {
               />
             </View>
 
-            <TouchableOpacity 
-              style={[styles.connectButton, isConnecting && styles.connectButtonDisabled]} 
+            <TouchableOpacity
+              style={[styles.connectButton, isConnecting && styles.connectButtonDisabled]}
               onPress={handleConnect}
               disabled={isConnecting}
             >
