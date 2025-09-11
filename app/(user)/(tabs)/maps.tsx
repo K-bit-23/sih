@@ -12,7 +12,7 @@ import { WebView } from "react-native-webview";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as Location from 'expo-location';
 import Colors from '@/constants/Colors';
-import { useLanguage } from '@/app/context/LanguageContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 // Open directions
 function openDirections(lat: number, lng: number) {
