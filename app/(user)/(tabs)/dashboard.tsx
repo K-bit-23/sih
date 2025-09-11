@@ -29,6 +29,7 @@ import Colors from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BleManager, Device } from "react-native-ble-plx";
 
 const wasteLog = [
   { id: "1", type: "Organic", weight: "1.2 kg", date: "2025-01-08", status: "Processed" },
@@ -52,11 +53,6 @@ interface UserProfile {
   email: string;
   phone: string;
   avatar: string | null;
-}
-
-interface MockDevice {
-  id: string;
-  name: string;
 }
 
 const InfoCard = ({ title, value, icon, color }: CardProps) => (
@@ -86,8 +82,9 @@ export default function DashboardScreen() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [greeting, setGreeting] = useState("");
   const [isBluetoothModalVisible, setBluetoothModalVisible] = useState(false);
-  const [discoveredDevices, setDiscoveredDevices] = useState<MockDevice[]>([]);
+  const [discoveredDevices, setDiscoveredDevices] = useState<Device[]>([]);
   const [isScanning, setIsScanning] = useState(false);
+  const bleManager = new BleManager();
 
   const orbitAnim = useRef(new Animated.Value(0)).current;
 
@@ -107,31 +104,63 @@ export default function DashboardScreen() {
     outputRange: ["0deg", "360deg"],
   });
 
-  const mockScan = () => {
-    setIsScanning(true);
-    setDiscoveredDevices([]);
+  const requestBluetoothPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Bluetooth Permission',
+          message: 'This app needs access to your location to use Bluetooth.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } else {
+      return true;
+    }
+  };
 
-    // Simulate device discovery
-    const mockDevices: MockDevice[] = [
-      { id: "1", name: "Smart Bin #001" },
-      { id: "2", name: "IoT Sensor #002" },
-      { id: "3", name: "Waste Monitor #003" },
-    ];
+  const scanForDevices = async () => {
+    const hasPermission = await requestBluetoothPermission();
+    if (!hasPermission) {
+      Alert.alert('Permission required', 'Location permission is required for Bluetooth scanning.');
+      return;
+    }
+
+    bleManager.startDeviceScan(null, null, (error, device) => {
+      setIsScanning(true);
+      if (error) {
+        console.error(error);
+        setIsScanning(false);
+        return;
+      }
+
+      if (device && device.name) {
+        setDiscoveredDevices((prev) => {
+          if (!prev.find((d) => d.id === device.id)) {
+            return [...prev, device];
+          }
+          return prev;
+        });
+      }
+    });
 
     setTimeout(() => {
-      setDiscoveredDevices(mockDevices);
+      bleManager.stopDeviceScan();
       setIsScanning(false);
-    }, 2000);
+    }, 5000);
   };
 
   const toggleBluetoothModal = () => {
     if (!isBluetoothModalVisible) {
-      mockScan();
+        scanForDevices();
     }
     setBluetoothModalVisible(!isBluetoothModalVisible);
   };
 
-  const handleDeviceConnect = (device: MockDevice) => {
+  const handleDeviceConnect = (device: Device) => {
     Alert.alert(
       "Device Connected",
       `Successfully connected to ${device.name}`,
@@ -245,7 +274,7 @@ export default function DashboardScreen() {
           </View>
           <View style={styles.headerRight}>
             <Animated.View style={[styles.orbitContainer, { transform: [{ rotate: rotation }] }]}>
-              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon1]} onPress={() => router.push("/(user)/iot-connect" as any)}>
+              <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon1]} onPress={() => router.push("/(user)/(tabs)/iot-connect" as any)}>
                 <FontAwesome5 name="wifi" size={16} color="white" />
               </TouchableOpacity>
               <TouchableOpacity style={[styles.orbitIcon, styles.orbitIcon2]} onPress={toggleBluetoothModal}>
@@ -313,7 +342,7 @@ export default function DashboardScreen() {
                   <View style={styles.emptyDevices}>
                     <FontAwesome5 name="search" size={32} color={Colors.light.text + '60'} />
                     <Text style={styles.emptyText}>No devices found</Text>
-                    <TouchableOpacity style={styles.rescanButton} onPress={mockScan}>
+                    <TouchableOpacity style={styles.rescanButton} onPress={scanForDevices}>
                       <Text style={styles.rescanText}>Scan Again</Text>
                     </TouchableOpacity>
                   </View>
