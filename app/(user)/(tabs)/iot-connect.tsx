@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View as RNView,
   TextInput,
   Alert,
   ScrollView,
@@ -11,7 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import { View } from '@/components/Themed';
-import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useLanguage } from '@/context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
