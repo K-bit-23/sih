@@ -13,6 +13,7 @@ import {
   FlatList,
   PermissionsAndroid,
   Platform,
+  Alert,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import WasteLogList from "@/components/WasteLogList";
@@ -28,7 +29,6 @@ import Colors from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BleManager, Device } from "react-native-ble-plx";
 
 const wasteLog = [
   { id: "1", type: "Organic", weight: "1.2 kg", date: "2025-01-08", status: "Processed" },
@@ -52,6 +52,11 @@ interface UserProfile {
   email: string;
   phone: string;
   avatar: string | null;
+}
+
+interface MockDevice {
+  id: string;
+  name: string;
 }
 
 const InfoCard = ({ title, value, icon, color }: CardProps) => (
@@ -81,23 +86,8 @@ export default function DashboardScreen() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [greeting, setGreeting] = useState("");
   const [isBluetoothModalVisible, setBluetoothModalVisible] = useState(false);
-  const [discoveredDevices, setDiscoveredDevices] = useState<Device[]>([]);
+  const [discoveredDevices, setDiscoveredDevices] = useState<MockDevice[]>([]);
   const [isScanning, setIsScanning] = useState(false);
-
-  // Initialize BLE manager safely
-  const [bleManager, setBleManager] = useState<BleManager | null>(null);
-
-  useEffect(() => {
-    // Only initialize BLE manager on native platforms
-    if (Platform.OS !== 'web') {
-      try {
-        const manager = new BleManager();
-        setBleManager(manager);
-      } catch (error) {
-        console.log('BLE not available:', error);
-      }
-    }
-  }, []);
 
   const orbitAnim = useRef(new Animated.Value(0)).current;
 
@@ -117,72 +107,37 @@ export default function DashboardScreen() {
     outputRange: ["0deg", "360deg"],
   });
 
-  const requestBluetoothPermission = async () => {
-    if (Platform.OS === "android") {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: "Bluetooth Permission",
-          message: "This app needs access to your location to scan for Bluetooth devices.",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK",
-        }
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    }
-    return true;
-  };
-
-  const startScan = async () => {
-    if (!bleManager) {
-      console.log('BLE Manager not available');
-      return;
-    }
-
-    const hasPermission = await requestBluetoothPermission();
-    if (!hasPermission) {
-      console.log("Bluetooth permission denied");
-      return;
-    }
-
+  const mockScan = () => {
     setIsScanning(true);
     setDiscoveredDevices([]);
 
-    bleManager.startDeviceScan(null, null, (error, device) => {
-      if (error) {
-        console.error(error);
-        setIsScanning(false);
-        return;
-      }
-      if (device && device.name) {
-        setDiscoveredDevices((prevDevices) => {
-          if (!prevDevices.find((d) => d.id === device.id)) {
-            return [...prevDevices, device];
-          }
-          return prevDevices;
-        });
-      }
-    });
+    // Simulate device discovery
+    const mockDevices: MockDevice[] = [
+      { id: "1", name: "Smart Bin #001" },
+      { id: "2", name: "IoT Sensor #002" },
+      { id: "3", name: "Waste Monitor #003" },
+    ];
 
     setTimeout(() => {
-      if (bleManager) {
-        bleManager.stopDeviceScan();
-      }
+      setDiscoveredDevices(mockDevices);
       setIsScanning(false);
-    }, 10000); // Scan for 10 seconds
+    }, 2000);
   };
 
   const toggleBluetoothModal = () => {
-    if (!bleManager && Platform.OS !== 'web') {
-      console.log('Bluetooth not available on this device');
-      return;
-    }
-    
     if (!isBluetoothModalVisible) {
-      startScan();
+      mockScan();
     }
     setBluetoothModalVisible(!isBluetoothModalVisible);
+  };
+
+  const handleDeviceConnect = (device: MockDevice) => {
+    Alert.alert(
+      "Device Connected",
+      `Successfully connected to ${device.name}`,
+      [{ text: "OK" }]
+    );
+    setBluetoothModalVisible(false);
   };
 
   const [temperature] = useState("28°C");
@@ -266,7 +221,7 @@ export default function DashboardScreen() {
     { title: "Scan Waste", icon: "camera", color: Colors.light.primary, route: "/(user)/(tabs)/analysis" },
     { title: "Find Bins", icon: "map-marker", color: Colors.light.accent, route: "/(user)/(tabs)/maps" },
     { title: "Community", icon: "group", color: "#3498db", route: "/(user)/community" },
-    { title: "Settings", icon: "cog", color: Colors.light.secondary, route: "/(user)/(tabs)/settings" },
+    { title: "Education", icon: "book", color: "#9b59b6", route: "/(user)/education" },
   ];
 
   return (
@@ -328,19 +283,43 @@ export default function DashboardScreen() {
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>{isScanning ? "Scanning..." : "Nearby Devices"}</Text>
-            <FlatList
-              data={discoveredDevices}
-              keyExtractor={(item) => item.id}
-              style={{ width: "100%" }}
-              renderItem={({ item }) => (
-                <View style={styles.deviceItem}>
-                  <Text style={styles.deviceName}>{item.name}</Text>
-                  <TouchableOpacity style={styles.connectButton}>
-                    <Text style={styles.connectButtonText}>Connect</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            />
+            {isScanning ? (
+              <View style={styles.scanningContainer}>
+                <Animated.View style={[styles.scanningDot, { transform: [{ rotate: rotation }] }]}>
+                  <FontAwesome5 name="bluetooth-b" size={24} color={Colors.light.primary} />
+                </Animated.View>
+                <Text style={styles.scanningText}>Looking for devices...</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={discoveredDevices}
+                keyExtractor={(item) => item.id}
+                style={{ width: "100%" }}
+                renderItem={({ item }) => (
+                  <View style={styles.deviceItem}>
+                    <View style={styles.deviceInfo}>
+                      <FontAwesome5 name="microchip" size={20} color={Colors.light.primary} />
+                      <Text style={styles.deviceName}>{item.name}</Text>
+                    </View>
+                    <TouchableOpacity 
+                      style={styles.connectButton}
+                      onPress={() => handleDeviceConnect(item)}
+                    >
+                      <Text style={styles.connectButtonText}>Connect</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                ListEmptyComponent={
+                  <View style={styles.emptyDevices}>
+                    <FontAwesome5 name="search" size={32} color={Colors.light.text + '60'} />
+                    <Text style={styles.emptyText}>No devices found</Text>
+                    <TouchableOpacity style={styles.rescanButton} onPress={mockScan}>
+                      <Text style={styles.rescanText}>Scan Again</Text>
+                    </TouchableOpacity>
+                  </View>
+                }
+              />
+            )}
             <TouchableOpacity
               style={styles.closeButton}
               onPress={toggleBluetoothModal}
@@ -404,13 +383,13 @@ export default function DashboardScreen() {
             <View style={styles.videoError}>
               <MaterialIcons name="videocam-off" size={32} color={Colors.light.text} />
               <Text style={styles.errorText}>Camera Offline</Text>
+              <Text style={styles.errorSubText}>Connect your IoT camera to view live feed</Text>
             </View>
           )}
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recent Activity</Text>
         <WasteLogList data={wasteLog.slice(0, 3)} />
       </View>
     </ScrollView>
@@ -477,12 +456,11 @@ const styles = StyleSheet.create({
   orbitIcon1: { transform: [{ translateY: -45 }] },
   orbitIcon2: { transform: [{ translateX: -45 }] },
   orbitIcon3: { transform: [{ translateX: 45 }] },
-  section: { marginTop: 25 },
+  section: { marginTop: 25, paddingHorizontal: 20 },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
     marginBottom: 15,
   },
   sectionTitle: {
@@ -496,7 +474,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   quickActionsContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
   },
   quickActionCard: {
     alignItems: "center",
@@ -522,7 +500,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
   },
-  cardsContainer: { paddingLeft: 20, paddingBottom: 10, paddingRight: 5 },
+  cardsContainer: { paddingLeft: 0, paddingBottom: 10, paddingRight: 5 },
   card: {
     width: 140,
     height: 120,
@@ -571,6 +549,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
   },
+  errorSubText: {
+    marginTop: 4,
+    color: Colors.light.text + '80',
+    fontSize: 12,
+    textAlign: "center",
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -592,6 +576,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     width: "85%",
+    maxHeight: "70%",
   },
   modalTitle: {
     fontSize: 18,
@@ -599,29 +584,69 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: Colors.light.text,
   },
+  scanningContainer: {
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  scanningDot: {
+    marginBottom: 20,
+  },
+  scanningText: {
+    fontSize: 16,
+    color: Colors.light.text + '80',
+  },
   deviceItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
     width: "100%",
   },
+  deviceInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
   deviceName: {
     fontSize: 16,
     color: Colors.light.text,
+    marginLeft: 12,
+    fontWeight: "500",
   },
   connectButton: {
     backgroundColor: Colors.light.primary,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
   },
   connectButtonText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 14,
+  },
+  emptyDevices: {
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: Colors.light.text + '80',
+    marginTop: 12,
+    marginBottom: 20,
+  },
+  rescanButton: {
+    backgroundColor: Colors.light.accent,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  rescanText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 14,
   },
   closeButton: {
     backgroundColor: Colors.light.accent,

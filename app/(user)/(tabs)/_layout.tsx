@@ -58,12 +58,6 @@ const TabLayout = () => {
           ),
         }}
       />
-      <Tabs.Screen
-        name="iot-connect"
-        options={{
-          href: null, // Hide from tab bar
-        }}
-      />
     </Tabs>
   );
 };

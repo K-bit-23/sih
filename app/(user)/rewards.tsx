@@ -1,10 +1,10 @@
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -21,7 +21,7 @@ const rewards = [
     points: 1500,
     icon: "bottle-water",
     color: ["#4c669f", "#3b5998", "#192f6a"],
-    image: "https://images.unsplash.com/photo-1613279165034-4b5a4a5f4f8b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://images.pexels.com/photos/416528/pexels-photo-416528.jpeg",
   },
   {
     id: "2",
@@ -29,7 +29,7 @@ const rewards = [
     points: 1200,
     icon: "shopping-bag",
     color: ["#f7b733", "#fc4a1a"],
-    image: "https://images.unsplash.com/photo-1594270433934-75489a2631a0?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://images.pexels.com/photos/1029896/pexels-photo-1029896.jpeg",
   },
   {
     id: "3",
@@ -37,7 +37,7 @@ const rewards = [
     points: 3500,
     icon: "solar-panel",
     color: ["#42e695", "#3bb2b8"],
-    image: "https://images.unsplash.com/photo-1516056589531-c454784e12c1?q=80&w=1962&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://images.pexels.com/photos/433308/pexels-photo-433308.jpeg",
   },
   {
     id: "4",
@@ -45,7 +45,7 @@ const rewards = [
     points: 1000,
     icon: "tree",
     color: ["#6a11cb", "#2575fc"],
-    image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://images.pexels.com/photos/1072824/pexels-photo-1072824.jpeg",
   },
   {
     id: "5",
@@ -53,7 +53,7 @@ const rewards = [
     points: 800,
     icon: "tooth",
     color: ["#00c6ff", "#0072ff"],
-    image: "https://images.unsplash.com/photo-1590846406792-04426b3a0dbb?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg",
   },
   {
     id: "6",
@@ -61,7 +61,7 @@ const rewards = [
     points: 5000,
     icon: "recycle",
     color: ["#d4fc79", "#96e6a1"],
-    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1913&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg",
   },
 ];
 
@@ -145,9 +145,10 @@ export default function RewardsScreen() {
         <Text style={styles.headerTitle}>Redeem Rewards</Text>
         <View style={styles.pointsContainer}>
           <FontAwesome5 name="star" solid size={20} color="#FFD700" />
-          <Text style={styles.pointsText}>Your Points: {userPoints.toLocaleString()}</Text>
+          <Text style={styles.pointsText}>{userPoints.toLocaleString()}</Text>
         </View>
       </LinearGradient>
+      
       <ScrollView contentContainerStyle={styles.gridContainer}>
         {rewards.map((reward) => (
           <TouchableOpacity 
@@ -169,7 +170,7 @@ export default function RewardsScreen() {
                 style={styles.rewardOverlay}
               >
                 <FontAwesome5
-                  name={reward.icon}
+                  name={reward.icon as any}
                   size={32}
                   color="white"
                   style={styles.rewardIcon}
@@ -206,35 +207,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   backButton: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    zIndex: 1,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
+    flex: 1,
     textAlign: "center",
   },
   pointsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 15,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 15,
-    alignSelf: "center",
   },
   pointsText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "white",
-    marginLeft: 10,
+    marginLeft: 8,
   },
   gridContainer: {
     flexDirection: "row",
