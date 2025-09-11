@@ -45,5 +45,15 @@
   "wifiSsid": "Wi-Fi SSID",
   "wifiPassword": "Wi-Fi Password",
   "connect": "Connect",
-  "fillAllFields": "Please fill in all fields"
+  "fillAllFields": "Please fill in all fields",
+  "nearbyBins": "Nearby Waste Bins",
+  "tapForDirections": "Tap for directions",
+  "bin_erode": "Bin - Erode (TN)",
+  "bin_thindal": "Bin - Thindal (TN)",
+  "bin_karur": "Bin - Karur (TN)",
+  "bin_coimbatore": "Bin - Coimbatore (TN)",
+  "bin_salem": "Bin - Salem (TN)",
+  "organic": "Organic",
+  "hazardous": "Hazardous",
+  "general": "General"
 }
