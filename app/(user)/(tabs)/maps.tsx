@@ -127,7 +127,7 @@ export default function MapsScreen() {
               <Text style={styles.binType}>{t(bin.typeKey)} Waste</Text>
               <Text style={styles.tapText}>➡️ {t('tapForDirections')}</Text>
             </TouchableOpacity>
-          ))褸
+          ))}
         </ScrollView>
       </View>
     </View>

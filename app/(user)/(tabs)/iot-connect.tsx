@@ -9,10 +9,10 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
-import { View } from '@/components/Themed';
+import { View } from '../../../components/Themed';
 import { FontAwesome5 } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
-import { useLanguage } from '@/context/LanguageContext';
+import Colors from '../../../constants/Colors';
+import { useLanguage } from '../../../context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
